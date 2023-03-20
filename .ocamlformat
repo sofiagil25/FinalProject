@@ -1,0 +1,8 @@
+profile = conventional
+break-cases = fit-or-vertical
+exp-grouping = preserve
+parse-docstrings = true
+type-decl = sparse
+wrap-comments = true
+
+# these are the formats from A2, we can change them if needed
