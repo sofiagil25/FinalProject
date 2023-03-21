@@ -17,6 +17,9 @@ test:
 play:
 	OCAMLRUNPARAM=b dune exec bin/main.exe
 
+graphics:
+	OCAMLRUNPARAM=b dune exec graphics/graphics.exe
+
 check:
 	@bash check.sh
 
