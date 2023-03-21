@@ -27,3 +27,4 @@ let rec line height dim prob acc : box list =
 let rec newboard width height acc : box list list =
   if height > 0 then newboard width (height - 1) (line height width 10 [] :: acc)
   else acc
+
