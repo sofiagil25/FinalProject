@@ -1,0 +1,3 @@
+(executable
+ (name graphics)
+ (libraries raylib raygui))
