@@ -10,8 +10,7 @@ let rec loop () =
     let open Raylib in
     begin_drawing ();
     clear_background Color.raywhite;
-    draw_text "Congrats! You created your first window!" 400 500 20
-      Color.lightgray;
+    draw_text "minesweeper? i hardly know her!" 350 450 20 Color.black;
     end_drawing ();
     loop ()
 

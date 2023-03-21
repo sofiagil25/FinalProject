@@ -1,4 +1,4 @@
-.PHONY: test check
+.PHONY: test check graphics
 
 build:
 	dune build
