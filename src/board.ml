@@ -6,7 +6,6 @@ type box = {
   col : int;
   bomb : int;
 }
-
 type board = { base : box list list }
 
 (* val tobox : int -> int -> box *)
