@@ -7,9 +7,6 @@ type board
    box is a bomb, the number of bombs the box is touching if not *)
 val tobox : int -> int -> int -> box
 
-(* [newboard (box list array)] is the *)
-val newboard : int -> int -> box list list -> box list list
-
 (* [newboard width height []] will return a box list list with dimensions width
    and height where each square is either a bomb or not a bomb*)
-val newboard : int -> int -> box list list -> box list list
+val newboard : int -> int -> box array array -> box array array
