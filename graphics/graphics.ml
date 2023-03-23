@@ -1,19 +1,18 @@
 open Raylib
 open Game
 
-let boxWidth : int = 20
-let xCoord = ref 0
-let yCoord = ref 0
+let boxWidth : int = 80
 
 let rec drawGrid m =
   for i = 0 to Array.length m - 1 do
     for j = 0 to Array.length (Array.get m i) - 1 do
       if Board.ismine m i j = -1 then
-        draw_rectangle !xCoord !yCoord boxWidth boxWidth Color.red
-      else draw_rectangle !xCoord !yCoord boxWidth boxWidth Color.gray;
-      yCoord := !yCoord + boxWidth
-    done;
-    xCoord := !xCoord + boxWidth
+        draw_rectangle_lines (i * boxWidth) (j * boxWidth) boxWidth boxWidth
+          Color.red
+      else
+        draw_rectangle_lines (i * boxWidth) (j * boxWidth) boxWidth boxWidth
+          Color.gray
+    done
   done
 
 let setup () =

@@ -1,2 +1,11 @@
 opam install raylib
 opam install raygui
+
+for windows, may have to run the following:
+
+sudo apt-get update
+
+sudo apt-get install libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev
+        libxrandr-dev pkg-config
+
+opam install raylib raygui
