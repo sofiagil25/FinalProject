@@ -16,8 +16,10 @@ let tobox (x : int) (y : int) (value : int) = { row = x; col = y; bomb = value }
 let newemptyline height (length : int) : box array =
   Array.init length (fun i -> { row = height; col = i; bomb = 0 })
 
-let rec newboard () width height (acc : box array array) : box array array =
+let rec newboard width height : box array array =
   Array.init height (fun i -> newemptyline i width)
+
+let ismine (game : box array array) x y = game.(y).(x).bomb
 
 (* new line of values: -1 for bomb, 0 for not bomb let rec line height dim prob
    acc : box list = match dim with | 0 -> acc | x -> ( match Random.int 10 with

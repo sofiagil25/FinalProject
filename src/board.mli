@@ -9,4 +9,5 @@ val tobox : int -> int -> int -> box
 
 (* [newboard width height []] will return a box list list with dimensions width
    and height where each square is either a bomb or not a bomb*)
-val newboard : int -> int -> box array array -> box array array
+val newboard : int -> int -> box array array
+val ismine : box array array -> int -> int -> int
