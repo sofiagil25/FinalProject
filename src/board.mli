@@ -11,3 +11,4 @@ val tobox : int -> int -> int -> box
    and height where each square is either a bomb or not a bomb*)
 val newboard : int -> int -> box array array
 val ismine : box array array -> int -> int -> int
+val getval : box -> int
