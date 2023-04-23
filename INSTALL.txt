@@ -1,3 +1,5 @@
+for mac, run the following 
+
 opam install raylib
 opam install raygui
 

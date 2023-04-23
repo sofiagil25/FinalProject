@@ -7,8 +7,9 @@ type board
    box is a bomb, the number of bombs the box is touching if not *)
 val tobox : int -> int -> int -> box
 
-(* [newboard width height []] will return a box list list with dimensions width
-   and height where each square is either a bomb or not a bomb*)
-val newboard : int -> int -> box array array
+(* [newboard width height prob] will return a box list list with dimensions
+   width and height where each square is either a bomb or not a bomb with
+   probability prob*)
+val newboard : int -> int -> int -> box array array
 val ismine : box array array -> int -> int -> int
 val getval : box -> int
