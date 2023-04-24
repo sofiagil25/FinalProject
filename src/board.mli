@@ -13,3 +13,5 @@ val tobox : int -> int -> int -> box
 val newboard : int -> int -> int -> box array array
 val ismine : box array array -> int -> int -> int
 val getval : box -> int
+val getcount : box array array -> int -> int -> int
+val boardwithvalue : box array array -> box array array

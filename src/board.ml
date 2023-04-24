@@ -25,14 +25,16 @@ let newemptyline height (length : int) prob : box array =
   Array.init length (fun i ->
       { row = height; col = i; bomb = bomborno prob; count = 0 })
 
+(* [height] rows of length [width]. so, newboard[height][width] is how to access
+   elements *)
 let rec newboard width height prob : box array array =
   Array.init height (fun i -> newemptyline i width prob)
 
-let ismine (game : box array array) x y = game.(y).(x).bomb
+let ismine (game : box array array) x y = game.(x).(y).bomb
 let isminebool game x y = if ismine game x y < 0 then true else false
 let getval (b : box) = b.bomb
-let getbox col row board = Array.get (Array.get board col) row
-
+let getbox col row board = Array.get (Array.get board row) col
+let getcount (game : box array array) x y = game.(x).(y).count
 (* let boardwbomb board prob = *)
 
 (* new line of values: -1 for bomb, 0 for not bomb *)
@@ -46,29 +48,34 @@ let getbox col row board = Array.get (Array.get board col) row
    [] :: acc) else acc *)
 
 let countup board col row acc =
-  if isminebool board col row then acc + 1 else acc
+  try if isminebool board row col then acc + 1 else acc with _ -> acc
 
 let onecount (boxi : box) boardi acc =
   countup boardi (boxi.col - 1) (boxi.row - 1) acc
   |> countup boardi (boxi.col - 1) boxi.row
   |> countup boardi (boxi.col - 1) (boxi.row + 1)
   |> countup boardi boxi.col (boxi.row + 1)
-  |> countup boardi (boxi.col - 1) (boxi.row + 1)
-  |> countup boardi (boxi.col - 1) (boxi.row + 1)
-  |> countup boardi (boxi.col - 1) boxi.row
-  |> countup boardi (boxi.col - 1) (boxi.row - 1)
+  |> countup boardi (boxi.col + 1) (boxi.row + 1)
+  |> countup boardi (boxi.col + 1) (boxi.row - 1)
+  |> countup boardi (boxi.col + 1) boxi.row
   |> countup boardi boxi.col (boxi.row - 1)
 
-let rec columnwithvalue (board : board) col =
+(* countup boardi (boxi.col - 1) (boxi.row - 1) acc |> countup boardi (boxi.col
+   - 1) boxi.row |> countup boardi (boxi.col - 1) (boxi.row + 1) |> countup
+   boardi boxi.col (boxi.row + 1) |> countup boardi (boxi.col + 1) (boxi.row +
+   1) |> countup boardi (boxi.col + 1) (boxi.row - 1) |> countup boardi
+   (boxi.col + 1) boxi.row |> countup boardi boxi.col (boxi.row - 1) *)
+
+let boardwithvalue (board : box array array) =
   Array.map
-    (fun y ->
+    (fun row ->
       Array.map
-        (fun x ->
+        (fun box ->
           {
-            row = x.row;
-            col = x.col;
-            bomb = x.bomb;
-            count = onecount x board.base 0;
+            row = box.row;
+            col = box.col;
+            bomb = box.bomb;
+            count = onecount box board 0;
           })
-        y)
-    board.base
+        row)
+    board
