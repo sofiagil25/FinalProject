@@ -7,7 +7,7 @@ let setup () =
   init_window 1000 900 "Minesweeper";
   set_mouse_scale 1. 1.
 
-let thisgameboard = Board.newboard 10 12 40
+let thisgameboard = Board.newboard 10 12 5
 
 let rec buildRects m =
   let rects =
@@ -35,10 +35,10 @@ let rec drawGrid m =
     for j = 0 to Array.length (Array.get m i) - 1 do
       if
         match rects.(i).(j) with
-        | _, bool -> bool
+        | _, bool -> not bool
       then
         draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
-          Color.green
+          Color.black
       else if Board.ismine m i j = -1 then
         draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth Color.red
       else (
@@ -52,19 +52,22 @@ let rec drawGrid m =
     done
   done
 
+let alive = ref true
+
 let findCollision mouse_pos =
   let rows = Array.length rects in
   let cols = Array.length rects.(0) in
-  let final_rect = ref None in
   for i = 0 to rows - 1 do
     for j = 0 to cols - 1 do
       let rectangle =
         match rects.(i).(j) with
         | rectangle, _ -> rectangle
       in
-      if check_collision_point_rec mouse_pos rectangle then
+      if check_collision_point_rec mouse_pos rectangle then (
         rects.(i).(j) <- (rectangle, true);
-      final_rect := Some (rectangle, true)
+        if Board.ismine (Board.boardwithvalue thisgameboard) i j = -1 then
+          alive := false
+        else alive := true)
     done
   done
 
@@ -73,9 +76,12 @@ let rec loop () =
   else
     let open Raylib in
     begin_drawing ();
-    clear_background Color.raywhite;
-    draw_text "minesweeper? i hardly know her!" 350 450 20 Color.black;
-    if is_cursor_on_screen () then (
+    if not !alive then (
+      clear_background Color.raywhite;
+      drawGrid (Board.boardwithvalue thisgameboard);
+      draw_text "you fucking lost" 350 450 50 Color.white)
+    else if is_cursor_on_screen () then (
+      draw_text "i fucking lost" 350 450 50 Color.white;
       clear_background Color.raywhite;
       drawGrid (Board.boardwithvalue thisgameboard);
       if is_mouse_button_pressed MouseButton.Left then
