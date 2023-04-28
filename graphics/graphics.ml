@@ -55,23 +55,46 @@ let rec drawGrid m =
 let alive = ref true
 
 let rec expandZeroTiles i j : unit =
-  let isZero = Board.getcount (Board.boardwithvalue thisgameboard) i j = 0 in
+  let isZero x y =
+    Board.getcount (Board.boardwithvalue thisgameboard) x y = 0
+  in
+  let isBomb x y = Board.ismine (Board.boardwithvalue thisgameboard) x y = -1 in
   let tileStatus x y =
     match rects.(x).(y) with
     | _, b -> b
   in
-  if isZero then
-    match rects.(i).(j) with
-    | rectangle, _ ->
-        rects.(i).(j) <- (rectangle, true);
-        if i - 1 >= 0 && not (tileStatus (i - 1) j) then
-          expandZeroTiles (i - 1) j;
-        if i + 1 < Array.length rects && not (tileStatus (i + 1) j) then
-          expandZeroTiles (i + 1) j;
-        if j - 1 >= 0 && not (tileStatus i (j - 1)) then
-          expandZeroTiles i (j - 1);
-        if j + 1 < Array.length rects.(0) && not (tileStatus i (j + 1)) then
-          expandZeroTiles i (j + 1)
+  let showTile x y =
+    match rects.(x).(y) with
+    | rectangle, _ -> rects.(x).(y) <- (rectangle, true)
+  in
+  if (not (isBomb i j)) && not (isZero i j) then begin
+    (*if not a zero tile but also not a bomb tile, then reveal those around it*)
+    showTile i j;
+    if i - 1 >= 0 && (not (tileStatus (i - 1) j)) && not (isBomb (i - 1) j) then
+      showTile (i - 1) j;
+    if
+      i + 1 < Array.length rects
+      && (not (tileStatus (i + 1) j))
+      && not (isBomb (i + 1) j)
+    then showTile (i + 1) j;
+    if j - 1 >= 0 && (not (tileStatus i (j - 1))) && not (isBomb i (j - 1)) then
+      showTile i (j - 1);
+    if
+      j + 1 < Array.length rects.(0)
+      && (not (tileStatus i (j + 1)))
+      && not (isBomb i (j + 1))
+    then showTile i (j + 1)
+  end
+  else if isZero i j then begin
+    (*if zero tile, then recurse on all those around it*)
+    showTile i j;
+    if i - 1 >= 0 && not (tileStatus (i - 1) j) then expandZeroTiles (i - 1) j;
+    if i + 1 < Array.length rects && not (tileStatus (i + 1) j) then
+      expandZeroTiles (i + 1) j;
+    if j - 1 >= 0 && not (tileStatus i (j - 1)) then expandZeroTiles i (j - 1);
+    if j + 1 < Array.length rects.(0) && not (tileStatus i (j + 1)) then
+      expandZeroTiles i (j + 1)
+  end
 
 let findCollision mouse_pos =
   let rows = Array.length rects in
@@ -86,8 +109,10 @@ let findCollision mouse_pos =
         rects.(i).(j) <- (rectangle, true);
         if Board.ismine (Board.boardwithvalue thisgameboard) i j = -1 then
           alive := false;
-        if Board.getcount (Board.boardwithvalue thisgameboard) i j = 0 then
-          expandZeroTiles i j)
+        if
+          Board.getcount (Board.boardwithvalue thisgameboard) i j = 0
+          && Board.ismine (Board.boardwithvalue thisgameboard) i j != -1
+        then expandZeroTiles i j)
     done
   done
 
