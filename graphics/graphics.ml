@@ -7,7 +7,7 @@ let setup () =
   init_window 1000 900 "Minesweeper";
   set_mouse_scale 1. 1.
 
-let thisgameboard = Board.newboard 10 12 5
+let thisgameboard = Board.newboard 10 12 15
 
 let rec buildRects m =
   let rects =
@@ -54,6 +54,25 @@ let rec drawGrid m =
 
 let alive = ref true
 
+let rec expandZeroTiles i j : unit =
+  let isZero = Board.getcount (Board.boardwithvalue thisgameboard) i j = 0 in
+  let tileStatus x y =
+    match rects.(x).(y) with
+    | _, b -> b
+  in
+  if isZero then
+    match rects.(i).(j) with
+    | rectangle, _ ->
+        rects.(i).(j) <- (rectangle, true);
+        if i - 1 >= 0 && not (tileStatus (i - 1) j) then
+          expandZeroTiles (i - 1) j;
+        if i + 1 < Array.length rects && not (tileStatus (i + 1) j) then
+          expandZeroTiles (i + 1) j;
+        if j - 1 >= 0 && not (tileStatus i (j - 1)) then
+          expandZeroTiles i (j - 1);
+        if j + 1 < Array.length rects.(0) && not (tileStatus i (j + 1)) then
+          expandZeroTiles i (j + 1)
+
 let findCollision mouse_pos =
   let rows = Array.length rects in
   let cols = Array.length rects.(0) in
@@ -66,8 +85,9 @@ let findCollision mouse_pos =
       if check_collision_point_rec mouse_pos rectangle then (
         rects.(i).(j) <- (rectangle, true);
         if Board.ismine (Board.boardwithvalue thisgameboard) i j = -1 then
-          alive := false
-        else alive := true)
+          alive := false;
+        if Board.getcount (Board.boardwithvalue thisgameboard) i j = 0 then
+          expandZeroTiles i j)
     done
   done
 
