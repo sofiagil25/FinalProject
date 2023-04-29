@@ -7,7 +7,7 @@ let setup () =
   init_window 1000 900 "Minesweeper";
   set_mouse_scale 1. 1.
 
-let thisgameboard = Board.newboard 10 12 15
+let thisgameboard = ref (Board.newboard 10 12 15)
 
 let rec buildRects m =
   let rects =
@@ -28,7 +28,7 @@ let rec buildRects m =
   done;
   rects
 
-let rects = buildRects thisgameboard
+let rects = buildRects !thisgameboard
 
 let rec drawGrid m =
   for i = 0 to Array.length m - 1 do
@@ -48,7 +48,7 @@ let rec drawGrid m =
           (string_of_int (Board.getcount m i j))
           ((i * boxWidth) + (boxWidth / 2))
           ((j * boxWidth) + (boxWidth / 2))
-          12 Color.black)
+          20 Color.black)
     done
   done
 
@@ -56,9 +56,11 @@ let alive = ref true
 
 let rec expandZeroTiles i j : unit =
   let isZero x y =
-    Board.getcount (Board.boardwithvalue thisgameboard) x y = 0
+    Board.getcount (Board.boardwithvalue !thisgameboard) x y = 0
   in
-  let isBomb x y = Board.ismine (Board.boardwithvalue thisgameboard) x y = -1 in
+  let isBomb x y =
+    Board.ismine (Board.boardwithvalue !thisgameboard) x y = -1
+  in
   let tileStatus x y =
     match rects.(x).(y) with
     | _, b -> b
@@ -107,28 +109,77 @@ let findCollision mouse_pos =
       in
       if check_collision_point_rec mouse_pos rectangle then (
         rects.(i).(j) <- (rectangle, true);
-        if Board.ismine (Board.boardwithvalue thisgameboard) i j = -1 then
+        if Board.ismine (Board.boardwithvalue !thisgameboard) i j = -1 then
           alive := false;
         if
-          Board.getcount (Board.boardwithvalue thisgameboard) i j = 0
-          && Board.ismine (Board.boardwithvalue thisgameboard) i j != -1
+          Board.getcount (Board.boardwithvalue !thisgameboard) i j = 0
+          && Board.ismine (Board.boardwithvalue !thisgameboard) i j != -1
         then expandZeroTiles i j)
     done
   done
 
+let buttony =
+  Rectangle.create
+    (float_of_int ((Array.length !thisgameboard * boxWidth / 3) - 70))
+    (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
+    200. 100.
+
+let buttonn =
+  Rectangle.create
+    (float_of_int ((Array.length !thisgameboard * boxWidth / 2) + 50))
+    (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
+    200. 100.
+
+let draw_lose () =
+  draw_text "you are a loser :c"
+    ((Array.length !thisgameboard * boxWidth / 3) - 50)
+    (Array.length (Array.get !thisgameboard 0) * boxWidth / 3)
+    50 Color.white;
+  draw_rectangle
+    ((Array.length !thisgameboard * boxWidth / 3) - 70)
+    (Array.length (Array.get !thisgameboard 0) * boxWidth / 2)
+    200 100 Color.white;
+  draw_rectangle
+    ((Array.length !thisgameboard * boxWidth / 2) + 50)
+    (Array.length (Array.get !thisgameboard 0) * boxWidth / 2)
+    200 100 Color.white;
+  draw_text "try again?"
+    ((Array.length !thisgameboard * boxWidth / 3) + 60)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 3) + 70)
+    40 Color.white;
+  draw_text "ye"
+    (Array.length !thisgameboard * boxWidth / 3)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
+    50 Color.black;
+  draw_text "nah"
+    ((Array.length !thisgameboard * boxWidth / 2) + 110)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
+    50 Color.black
+
+let close = ref false
+
 let rec loop () =
-  if Raylib.window_should_close () then Raylib.close_window ()
+  if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let open Raylib in
     begin_drawing ();
     if not !alive then (
       clear_background Color.raywhite;
-      drawGrid (Board.boardwithvalue thisgameboard);
-      draw_text "you fucking lost" 350 450 50 Color.white)
+      drawGrid (Board.boardwithvalue !thisgameboard);
+      draw_lose ();
+      if is_mouse_button_pressed MouseButton.Left then
+        if check_collision_point_rec (get_mouse_position ()) buttony then (
+          clear_background Color.white;
+          thisgameboard := Board.newboard 10 12 15;
+          alive := true;
+          drawGrid (Board.boardwithvalue !thisgameboard))
+        else if check_collision_point_rec (get_mouse_position ()) buttonn then (
+          end_drawing ();
+          close := true))
     else if is_cursor_on_screen () then (
       draw_text "i fucking lost" 350 450 50 Color.white;
       clear_background Color.raywhite;
-      drawGrid (Board.boardwithvalue thisgameboard);
+      drawGrid (Board.boardwithvalue !thisgameboard);
       if is_mouse_button_pressed MouseButton.Left then
         let mouse_pos = get_mouse_position in
         findCollision (mouse_pos ()));
