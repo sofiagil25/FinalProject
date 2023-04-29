@@ -158,6 +158,15 @@ let draw_lose () =
 
 let close = ref false
 
+let rec resetBoard (x : int) (y : int) =
+  if x < 12 then
+    if y < 10 then (
+      match rects.(x).(y) with
+      | rectangle, _ ->
+          rects.(x).(y) <- (rectangle, false);
+          resetBoard x (y + 1) (* else resetBoard x (y + 1); *))
+    else resetBoard (x + 1) 0
+
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
@@ -171,6 +180,8 @@ let rec loop () =
         if check_collision_point_rec (get_mouse_position ()) buttony then (
           clear_background Color.white;
           thisgameboard := Board.newboard 10 12 15;
+          resetBoard 0 0;
+
           alive := true;
           drawGrid (Board.boardwithvalue !thisgameboard))
         else if check_collision_point_rec (get_mouse_position ()) buttonn then (
