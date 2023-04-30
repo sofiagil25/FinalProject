@@ -7,7 +7,7 @@ let setup () =
   init_window 1000 900 "Minesweeper";
   set_mouse_scale 1. 1.
 
-let thisgameboard = ref (Board.newboard 10 12 15)
+let thisgameboard = ref (Board.newboard 5 5 15)
 
 let rec buildRects m =
   let rects =
@@ -167,11 +167,44 @@ let rec resetBoard (x : int) (y : int) =
           resetBoard x (y + 1) (* else resetBoard x (y + 1); *))
     else resetBoard (x + 1) 0
 
+let countbombs () : int =
+  let x = ref 0 in
+  for i = 0 to Array.length rects - 1 do
+    for j = 0 to Array.length (Array.get rects i) - 1 do
+      if Board.ismine (Board.boardwithvalue !thisgameboard) i j = -1 then
+        x := !x + 1
+      else if
+        Board.getcount (Board.boardwithvalue !thisgameboard) i j = 0
+        && Board.ismine (Board.boardwithvalue !thisgameboard) i j != -1
+      then x := !x
+    done
+  done;
+  !x
+
+let countuncovered () : int =
+  let x = ref 0 in
+  for i = 0 to Array.length rects - 1 do
+    for j = 0 to Array.length (Array.get rects i) - 1 do
+      if
+        match rects.(i).(j) with
+        | _, bool -> not bool
+      then x := !x
+      else if Board.ismine !thisgameboard i j = -1 then x := !x
+      else x := 1 + !x
+    done
+  done;
+  !x
+
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let open Raylib in
     begin_drawing ();
+    (* draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
+       draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
+       draw_text (string_of_int (Array.length !thisgameboard * Array.length
+       (Array.get !thisgameboard 0))) 550 450 50 Color.black; put these in a
+       different place they show score*)
     if not !alive then (
       clear_background Color.raywhite;
       drawGrid (Board.boardwithvalue !thisgameboard);
@@ -181,15 +214,21 @@ let rec loop () =
           clear_background Color.white;
           thisgameboard := Board.newboard 10 12 15;
           resetBoard 0 0;
-
           alive := true;
           drawGrid (Board.boardwithvalue !thisgameboard))
         else if check_collision_point_rec (get_mouse_position ()) buttonn then (
           end_drawing ();
           close := true))
     else if is_cursor_on_screen () then (
-      draw_text "i fucking lost" 350 450 50 Color.white;
-      clear_background Color.raywhite;
+      if
+        (Array.length !thisgameboard * Array.length (Array.get !thisgameboard 0))
+        - countuncovered ()
+        = countbombs ()
+      then (
+        clear_background Color.raywhite;
+        drawGrid (Board.boardwithvalue !thisgameboard);
+        draw_text "yipeeee" 350 450 50 Color.black)
+      else clear_background Color.raywhite;
       drawGrid (Board.boardwithvalue !thisgameboard);
       if is_mouse_button_pressed MouseButton.Left then
         let mouse_pos = get_mouse_position in
