@@ -4,7 +4,7 @@ open Game
 let boxWidth : int = 80
 
 let setup () =
-  init_window 1000 900 "Minesweeper";
+  init_window 900 900 "Minesweeper";
   set_mouse_scale 1. 1.
 
 let thisgameboard = ref (Board.newboard 5 5 15)
@@ -33,22 +33,27 @@ let rects = buildRects !thisgameboard
 let rec drawGrid m =
   for i = 0 to Array.length m - 1 do
     for j = 0 to Array.length (Array.get m i) - 1 do
-      if
-        match rects.(i).(j) with
-        | _, bool -> not bool
-      then
+      if Board.getflag m i j = false then
+        if
+          match rects.(i).(j) with
+          | _, bool -> not bool
+        then
+          draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
+            Color.black
+        else if Board.ismine m i j = -1 then
+          draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
+            Color.red
+        else (
+          draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
+            Color.gray;
+          draw_text
+            (string_of_int (Board.getcount m i j))
+            ((i * boxWidth) + (boxWidth / 2))
+            ((j * boxWidth) + (boxWidth / 2))
+            20 Color.black)
+      else
         draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
-          Color.black
-      else if Board.ismine m i j = -1 then
-        draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth Color.red
-      else (
-        draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
-          Color.gray;
-        draw_text
-          (string_of_int (Board.getcount m i j))
-          ((i * boxWidth) + (boxWidth / 2))
-          ((j * boxWidth) + (boxWidth / 2))
-          20 Color.black)
+          Color.yellow
     done
   done
 
@@ -98,6 +103,8 @@ let rec expandZeroTiles i j : unit =
       expandZeroTiles i (j + 1)
   end
 
+let flagstate = ref false
+
 let findCollision mouse_pos =
   let rows = Array.length rects in
   let cols = Array.length rects.(0) in
@@ -109,12 +116,14 @@ let findCollision mouse_pos =
       in
       if check_collision_point_rec mouse_pos rectangle then (
         rects.(i).(j) <- (rectangle, true);
-        if Board.ismine (Board.boardwithvalue !thisgameboard) i j = -1 then
-          alive := false;
-        if
-          Board.getcount (Board.boardwithvalue !thisgameboard) i j = 0
-          && Board.ismine (Board.boardwithvalue !thisgameboard) i j != -1
-        then expandZeroTiles i j)
+        if !flagstate = false then (
+          if Board.ismine (Board.boardwithvalue !thisgameboard) i j = -1 then
+            alive := false;
+          if
+            Board.getcount (Board.boardwithvalue !thisgameboard) i j = 0
+            && Board.ismine (Board.boardwithvalue !thisgameboard) i j != -1
+          then expandZeroTiles i j)
+        else Board.setflag (Board.boardwithvalue !thisgameboard) i j)
     done
   done
 
@@ -200,11 +209,13 @@ let rec loop () =
   else
     let open Raylib in
     begin_drawing ();
-    (* draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
-       draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
-       draw_text (string_of_int (Array.length !thisgameboard * Array.length
-       (Array.get !thisgameboard 0))) 550 450 50 Color.black; put these in a
-       different place they show score*)
+    draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
+    draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
+    draw_text
+      (string_of_int
+         (Array.length !thisgameboard
+         * Array.length (Array.get !thisgameboard 0)))
+      550 450 50 Color.black;
     if not !alive then (
       clear_background Color.raywhite;
       drawGrid (Board.boardwithvalue !thisgameboard);
@@ -213,6 +224,7 @@ let rec loop () =
         if check_collision_point_rec (get_mouse_position ()) buttony then (
           clear_background Color.white;
           thisgameboard := Board.newboard 10 12 15;
+          flagstate := false;
           resetBoard 0 0;
           alive := true;
           drawGrid (Board.boardwithvalue !thisgameboard))
