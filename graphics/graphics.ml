@@ -5,11 +5,14 @@ let boxWidth : int = 80
 
 let setup () =
   init_window 900 900 "Minesweeper";
+  set_target_fps 60;
   set_mouse_scale 1. 1.
 
 let currx = ref 5
 let curry = ref 5
 let thisgameboard = ref (Board.newboard !currx !curry 15)
+let started = ref false
+let top_bar_size = 250
 
 let rec buildRects m =
   let rects =
@@ -21,8 +24,8 @@ let rec buildRects m =
     for j = 0 to Array.length (Array.get m i) - 1 do
       let rect =
         Rectangle.create
-          (i * boxWidth |> float_of_int)
-          (j * boxWidth |> float_of_int)
+          (top_bar_size + (i * boxWidth) |> float_of_int)
+          (top_bar_size + (j * boxWidth) |> float_of_int)
           (boxWidth |> float_of_int) (boxWidth |> float_of_int)
       in
       rects.(i).(j) <- (rect, false)
@@ -31,6 +34,8 @@ let rec buildRects m =
   rects
 
 let rects = buildRects !thisgameboard
+let y_coordinate orig_width j = top_bar_size + (j * orig_width)
+let x_coordinate orig_width x = top_bar_size + (x * orig_width)
 
 let rec drawGrid m =
   for i = 0 to Array.length m - 1 do
@@ -40,22 +45,22 @@ let rec drawGrid m =
           match rects.(i).(j) with
           | _, bool -> not bool
         then
-          draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
-            Color.black
+          draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
+            boxWidth boxWidth Color.black
         else if Board.ismine m i j = -1 then
-          draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
-            Color.red
+          draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
+            boxWidth boxWidth Color.red
         else (
-          draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
-            Color.gray;
+          draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
+            boxWidth boxWidth Color.gray;
           draw_text
             (string_of_int (Board.getcount m i j))
-            ((i * boxWidth) + (boxWidth / 2))
-            ((j * boxWidth) + (boxWidth / 2))
+            (x_coordinate boxWidth i + (boxWidth / 2))
+            (y_coordinate boxWidth j + (boxWidth / 2))
             20 Color.black)
       else
-        draw_rectangle (i * boxWidth) (j * boxWidth) boxWidth boxWidth
-          Color.yellow
+        draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
+          boxWidth boxWidth Color.yellow
     done
   done
 
@@ -135,6 +140,26 @@ let buttony =
     (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
     200. 100.
 
+let draw_start_button () =
+  draw_rectangle
+    ((Array.length !thisgameboard * boxWidth / 3) - 70)
+    (Array.length (Array.get !thisgameboard 0) * boxWidth / 2)
+    200 100 Color.black;
+  draw_text "Start"
+    ((Array.length !thisgameboard * boxWidth / 3) - 60)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 10)
+    30 Color.red;
+  draw_text "Game"
+    ((Array.length !thisgameboard * boxWidth / 3) - 60)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 50)
+    30 Color.red
+
+let start_button =
+  Rectangle.create
+    (float_of_int ((Array.length !thisgameboard * boxWidth / 3) - 70))
+    (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
+    200. 100.
+
 let buttonn =
   Rectangle.create
     (float_of_int ((Array.length !thisgameboard * boxWidth / 2) + 50))
@@ -206,47 +231,63 @@ let countuncovered () : int =
   done;
   !x
 
+let draw_instructions () =
+  clear_background Color.orange;
+  draw_text "Instructions: the thing does the thing" 50 50 30 Color.black;
+  draw_text "Press any box to start playing" 350 650 30 Color.black
+
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let open Raylib in
     begin_drawing ();
-    draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
-    draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
-    draw_text
-      (string_of_int
-         (Array.length !thisgameboard
-         * Array.length (Array.get !thisgameboard 0)))
-      550 450 50 Color.black;
-    if not !alive then (
-      clear_background Color.raywhite;
-      drawGrid (Board.boardwithvalue !thisgameboard);
-      draw_lose ();
-      if is_mouse_button_pressed MouseButton.Left then
-        if check_collision_point_rec (get_mouse_position ()) buttony then (
-          clear_background Color.white;
-          thisgameboard := Board.newboard !currx !curry 15;
-          flagstate := false;
-          resetBoard 0 0;
-          alive := true;
-          drawGrid (Board.boardwithvalue !thisgameboard))
-        else if check_collision_point_rec (get_mouse_position ()) buttonn then (
-          end_drawing ();
-          close := true))
-    else if is_cursor_on_screen () then (
-      if
-        (Array.length !thisgameboard * Array.length (Array.get !thisgameboard 0))
-        - countuncovered ()
-        = countbombs ()
-      then (
+    draw_instructions ();
+    if is_mouse_button_pressed MouseButton.Left then
+      if check_collision_point_rec (get_mouse_position ()) start_button then
+        started := true;
+    if !started = true then (
+      draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
+      draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
+      draw_text
+        (string_of_int
+           (Array.length !thisgameboard
+           * Array.length (Array.get !thisgameboard 0)))
+        550 450 50 Color.black;
+      if not !alive then (
         clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
-        draw_text "yipeeee" 350 450 50 Color.black)
-      else clear_background Color.raywhite;
-      drawGrid (Board.boardwithvalue !thisgameboard);
-      if is_mouse_button_pressed MouseButton.Left then
-        let mouse_pos = get_mouse_position in
-        findCollision (mouse_pos ()));
+        draw_lose ();
+        if is_mouse_button_pressed MouseButton.Left then
+          if check_collision_point_rec (get_mouse_position ()) buttony then (
+            clear_background Color.white;
+            thisgameboard := Board.newboard !currx !curry 15;
+            flagstate := false;
+            resetBoard 0 0;
+            started := true;
+            alive := true;
+            drawGrid (Board.boardwithvalue !thisgameboard))
+          else if check_collision_point_rec (get_mouse_position ()) buttonn then (
+            end_drawing ();
+            started := true;
+            close := true))
+      else if is_cursor_on_screen () then (
+        if
+          Array.length !thisgameboard
+          * Array.length (Array.get !thisgameboard 0)
+          - countuncovered ()
+          = countbombs ()
+        then (
+          clear_background Color.raywhite;
+          drawGrid (Board.boardwithvalue !thisgameboard);
+          draw_text "yipeeee" 350 450 50 Color.black)
+        else clear_background Color.raywhite;
+        drawGrid (Board.boardwithvalue !thisgameboard);
+        if is_mouse_button_pressed MouseButton.Left then
+          let mouse_pos = get_mouse_position in
+          findCollision (mouse_pos ())))
+    else draw_start_button ();
+    clear_background Color.white;
+
     end_drawing ();
     loop ()
 

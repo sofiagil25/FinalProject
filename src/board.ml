@@ -12,8 +12,8 @@ type box = {
 type board = { base : box array array }
 
 (* val tobox : int -> int -> box *)
-let tobox (x : int) (y : int) (value : int) =
-  { row = x; col = y; bomb = value; count = 0; flag = false }
+let tobox (x : int) (y : int) (value : int) (boo : bool) =
+  { row = x; col = y; bomb = value; count = 0; flag = boo }
 
 (* prob is a value from 0 to 100 representing the probability that any one
    square is a bomb *)
