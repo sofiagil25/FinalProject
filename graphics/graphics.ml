@@ -10,7 +10,8 @@ let setup () =
 
 let currx = ref 5
 let curry = ref 5
-let thisgameboard = ref (Board.newboard !currx !curry 15)
+let currprob = ref 25
+let thisgameboard = ref (Board.newboard !currx !curry !currprob)
 let started = ref false
 let top_bar_size = 250
 
@@ -85,19 +86,21 @@ let rec expandZeroTiles i j : unit =
     (*if not a zero tile but also not a bomb tile, then reveal those around it*)
     showTile i j;
     if i - 1 >= 0 && (not (tileStatus (i - 1) j)) && not (isBomb (i - 1) j) then
-      showTile (i - 1) j;
+      if isZero (i - 1) j then expandZeroTiles (i - 1) j else showTile (i - 1) j;
     if
       i + 1 < Array.length rects
       && (not (tileStatus (i + 1) j))
       && not (isBomb (i + 1) j)
-    then showTile (i + 1) j;
+    then
+      if isZero (i + 1) j then expandZeroTiles (i + 1) j else showTile (i + 1) j;
     if j - 1 >= 0 && (not (tileStatus i (j - 1))) && not (isBomb i (j - 1)) then
-      showTile i (j - 1);
+      if isZero i (j - 1) then expandZeroTiles i (j - 1) else showTile i (j - 1);
     if
       j + 1 < Array.length rects.(0)
       && (not (tileStatus i (j + 1)))
       && not (isBomb i (j + 1))
-    then showTile i (j + 1)
+    then
+      if isZero i (j + 1) then expandZeroTiles i (j + 1) else showTile i (j + 1)
   end
   else if isZero i j then begin
     (*if zero tile, then recurse on all those around it*)
