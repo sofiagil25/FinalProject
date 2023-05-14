@@ -12,7 +12,7 @@ type box = {
 type board = { base : box array array }
 
 (* val tobox : int -> int -> box *)
-let tobox (x : int) (y : int) (value : int) (boo : bool) =
+let tobox (x : int) (y : int) (value : int) (count : int) (boo : bool) =
   { row = x; col = y; bomb = value; count = 0; flag = boo }
 
 (* prob is a value from 0 to 100 representing the probability that any one
@@ -33,7 +33,8 @@ let rec newboard width height prob : box array array =
 
 let ismine (game : box array array) x y = game.(x).(y).bomb
 let isminebool game x y = if ismine game x y < 0 then true else false
-let getval (b : box) = b.bomb
+
+(* let getval (b : box) = b.bomb *)
 let getbox col row board = Array.get (Array.get board row) col
 let getcount (game : box array array) x y = game.(x).(y).count
 let getflag (game : box array array) x y = game.(x).(y).flag
