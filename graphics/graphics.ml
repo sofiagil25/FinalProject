@@ -7,7 +7,9 @@ let setup () =
   init_window 900 900 "Minesweeper";
   set_mouse_scale 1. 1.
 
-let thisgameboard = ref (Board.newboard 5 5 15)
+let currx = ref 5
+let curry = ref 5
+let thisgameboard = ref (Board.newboard !currx !curry 15)
 
 let rec buildRects m =
   let rects =
@@ -168,8 +170,8 @@ let draw_lose () =
 let close = ref false
 
 let rec resetBoard (x : int) (y : int) =
-  if x < 12 then
-    if y < 10 then (
+  if x < !currx then
+    if y < !curry then (
       match rects.(x).(y) with
       | rectangle, _ ->
           rects.(x).(y) <- (rectangle, false);
@@ -223,7 +225,7 @@ let rec loop () =
       if is_mouse_button_pressed MouseButton.Left then
         if check_collision_point_rec (get_mouse_position ()) buttony then (
           clear_background Color.white;
-          thisgameboard := Board.newboard 10 12 15;
+          thisgameboard := Board.newboard !currx !curry 15;
           flagstate := false;
           resetBoard 0 0;
           alive := true;
