@@ -17,3 +17,4 @@ val getcount : box array array -> int -> int -> int
 val boardwithvalue : box array array -> box array array
 val getflag : box array array -> int -> int -> bool
 val setflag : box array array -> int -> int -> unit
+val isboardsequalquestionmark : box array array -> box array array -> bool
