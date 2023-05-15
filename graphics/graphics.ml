@@ -389,17 +389,31 @@ let draw_beginning_screen () =
   draw_easy_button ();
   draw_medium_button ();
   draw_hard_button ()
+let lose () = 
+clear_background Color.raywhite;
+drawGrid (Board.boardwithvalue !thisgameboard);
+draw_lose ();
+if is_mouse_button_pressed MouseButton.Left then
+if check_collision_point_rec (get_mouse_position ()) buttony then
+  restart_game ()
+else if check_collision_point_rec (get_mouse_position ()) buttonn then
+quit_game ()
+
 
 let draw_time orig_seconds remaining_seconds =
+  let ycoord = top_bar_size-50 in
+  let offset=320 in
+  let xcoord=top_bar_size+offset in 
+  draw_text "Time remaining: " (xcoord-offset) ycoord (50) Color.red;
   match remaining_seconds with
-  | 10 -> draw_text "HALF TIME LEFT" 650 450 50 Color.red
-  | 5 -> draw_text "FIVE SECONDS" 650 450 50 Color.red
-  | 4 -> draw_text "HURRY UP" 650 450 50 Color.red
-  | 3 -> draw_text "THREE SECS LEFT" 650 450 50 Color.red
-  | 2 -> draw_text "TWOOOOOOO" 650 450 50 Color.red
-  | 1 -> draw_text "ONEEEEEEE" 650 450 50 Color.red
-  | 0 -> draw_text "YOU LOSSEEEEEE" 650 450 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) 650 450 50 Color.red
+  | 10 -> draw_text "HALF TIME LEFT" (xcoord+offset) ycoord 50 Color.red
+  | 5 -> draw_text "FIVE SECONDS" (xcoord+offset) ycoord 50 Color.red
+  | 4 -> draw_text "HURRY UP" (xcoord+offset) ycoord 50 Color.red
+  | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
+  | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
+  | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
+  | 0 -> draw_text "YOU LOSSEEEEEE" (xcoord+70) ycoord 50 Color.red
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
@@ -439,20 +453,11 @@ let rec loop () =
     else if !ifwin = false && !started=false then (
           draw_beginning_screen ();
           clear_background Color.white)
-    else if time_left<0 then(
-          clear_background Color.raywhite;
-          drawGrid (Board.boardwithvalue !thisgameboard);
-          draw_lose ();
-          if is_mouse_button_pressed MouseButton.Left then
-          if check_collision_point_rec (get_mouse_position ()) buttony then
-            restart_game ()
-          else if check_collision_point_rec (get_mouse_position ()) buttonn then
-          quit_game ())
+    else if time_left<0 then
+      lose()
  
     else if time_left>=0 then 
       draw_win ();
-   
-
     end_drawing ();
     loop ()
 
