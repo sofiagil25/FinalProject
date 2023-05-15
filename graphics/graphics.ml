@@ -4,10 +4,55 @@ open Game
 let boxWidth : int = 80
 let screenwidth = 900
 
+type info_packet = {
+  textures : Texture2D.t list;
+}
+
 let setup () =
   init_window screenwidth screenwidth "Minesweeper";
   set_target_fps 60;
-  set_mouse_scale 1. 1.
+  set_mouse_scale 1. 1.;
+
+  let micheal_clarkson = load_image "img/clarkson.png" in
+  let coin = load_image "img/coin.png" in
+  let heart = load_image "img/heart.png"in
+  let bomb = load_image "img/bomb.png" in
+  let micheal_clarkson_mad = load_image "img/clarkson.jpeg" in
+  let dexter_kozen = load_image "img/dexter.jpeg" in
+
+  image_resize (addr micheal_clarkson) 200 200;
+  image_resize (addr coin) 200 200;
+  image_resize (addr heart) 200 200;
+  image_resize (addr bomb) 200 200;
+  image_resize (addr micheal_clarkson_mad) 200 200;
+  image_resize (addr dexter_kozen) 200 200;
+
+  let clarkson_texture = load_texture_from_image micheal_clarkson in
+  let coin_texture = load_texture_from_image coin in
+  let heart_texture = load_texture_from_image heart in
+  let bomb_texture = load_texture_from_image bomb in
+  let clarkson_mad_texture = load_texture_from_image micheal_clarkson_mad in
+  let dexter_texture = load_texture_from_image dexter_kozen in
+
+
+  unload_image micheal_clarkson;
+  unload_image coin;
+  unload_image heart;
+  unload_image bomb;
+  unload_image micheal_clarkson_mad;
+  unload_image dexter_kozen;
+  {
+    textures =
+      [
+        clarkson_texture;
+        coin_texture;
+        heart_texture;
+        bomb_texture;
+        clarkson_mad_texture;
+        dexter_texture;
+      ];
+  }
+
 
 let currx = ref 4
 let curry = ref 4
@@ -462,7 +507,7 @@ else if(!hardstate=true && !alive=true) then
   | 0 -> draw_text "YOU LOSE. it's ok that was hard." (xcoord+70) ycoord 20 Color.red
   | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
 
-let rec loop () =
+let rec loop () info_packet=
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let elapsed_time = Raylib.get_time () -. !currstarttime 
@@ -518,6 +563,6 @@ let rec loop () =
     
 
     end_drawing ();
-    loop ()
+    loop (){textures = info_packet.textures;}
 
-let () = setup () |> loop
+let () = setup () |> loop()
