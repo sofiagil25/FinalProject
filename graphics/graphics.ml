@@ -9,8 +9,8 @@ let setup () =
   set_target_fps 60;
   set_mouse_scale 1. 1.
 
-let currx = ref 5
-let curry = ref 5
+let currx = ref 4
+let curry = ref 4
 let edit_game = ref (false)
 
 let start_mode=ref(true)
@@ -76,7 +76,7 @@ let alive = ref true
 let isZero x y =
   Board.getcount (Board.boardwithvalue !thisgameboard) x y = 0
 
-  
+
 
 let isBomb x y =
     Board.ismine (Board.boardwithvalue !thisgameboard) x y = -1
@@ -222,16 +222,12 @@ let game_start () =
 
 let easy_mode()=
 currtotaltime:= 150.;
-currx:=5;
-curry:=5;
 currprob:=25;
 thisgameboard:=Board.newboard !currx !curry !currprob;
 game_start()
 
 let medium_mode()= 
 currtotaltime:= 150.;
-currx:=5;
-curry:=5;
 currprob:=35;
 thisgameboard:=Board.newboard !currx !curry !currprob;
 currtotaltime:=60.;
@@ -239,8 +235,6 @@ game_start()
 
 let hard_mode()= 
 currtotaltime:= 150.;
-currx:=20;
-curry:=20;
 currprob:=45;
 thisgameboard:=Board.newboard !currx !curry !currprob; (* this is what breaks the cide *)
 currtotaltime:=40.;
@@ -374,7 +368,21 @@ let quit_game () =
 
 let draw_win () =
   clear_background Color.raywhite;
-  draw_text "YIPEEEEEEEEEEEEEEEEEEEEEEEEEEEEE" 50 50 100 Color.black
+  draw_text "YIPEEEEEEE \n YOU WON" 50 50 100 Color.pink;
+  draw_text "another challenge?"
+  ((Array.length !thisgameboard * boxWidth / 3) + 60)
+  ((Array.length (Array.get !thisgameboard 0) * boxWidth / 3) + 70)
+  40 Color.orange;
+  draw_text "ye"
+  (Array.length !thisgameboard * boxWidth / 3)
+  ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
+  50 Color.black;
+  draw_text "nah"
+  ((Array.length !thisgameboard * boxWidth / 2) + 110)
+  ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
+  50 Color.black
+  
+
 
 let ifwin = ref false
 
@@ -490,8 +498,17 @@ let rec loop () =
           restart_game ()
         else if check_collision_point_rec (get_mouse_position ()) buttonn then
           quit_game ())
-    else if time_left>=0 then 
-      draw_win ();
+    else if time_left>=0 then (
+      draw_win();
+      if is_mouse_button_pressed MouseButton.Left then(
+        if check_collision_point_rec (get_mouse_position ()) buttony then(
+          ifwin:=false;
+          restart_game ())
+        else if check_collision_point_rec (get_mouse_position ()) buttonn then(
+          ifwin:=false;
+          quit_game ())
+      ));
+    
 
     end_drawing ();
     loop ()
