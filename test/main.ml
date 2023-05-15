@@ -12,7 +12,12 @@ open Game
    for the both. This is simple equality. The second standand was full equality.
    Full equality implies that the count, flag, bomb value, obstacle status, and
    solution status are all equal for equivalent elements of boards a and b. *)
-(* description *)
+(* We tested the UI seperately by playing each mode in combination with each
+   feature. Clearly a lot of the functions are visible, and if they weren't
+   working the game wouldn't run. We also did test-driven development, so we
+   would implement each feature, test it pretty thoroughly, and then move on,
+   which ensured that everything works. We were systematic about testing each
+   other's code instead of our own so that we could be extra critical. *)
 let thisgameboard = ref (Board.newboard 6 5 15)
 let thisboard = Array.make 5 (Board.tobox 0 0 0)
 
