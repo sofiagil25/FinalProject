@@ -411,7 +411,7 @@ let quit_game () =
   started := true;
   close := true
 
-let draw_win () =
+let draw_win textures =
   clear_background Color.raywhite;
   draw_rectangle
   (top_bar_size) (top_bar_size) 200 100 Color.pink;
@@ -424,9 +424,12 @@ let draw_win () =
   draw_text "ye"
   (top_bar_size+10)(top_bar_size)
   50 Color.black;
+  draw_texture (List.nth (textures) 0) 500 200  Color.raywhite;
   draw_text "nah"
   (top_bar_size+220)(top_bar_size)
   50 Color.black
+
+
 
 let buttonywin =
     Rectangle.create
@@ -551,7 +554,7 @@ let rec loop () info_packet=
         else if check_collision_point_rec (get_mouse_position ()) buttonn then
           quit_game ())
     else if time_left>=0 then (
-      draw_win();
+      draw_win info_packet.textures;
       if is_mouse_button_pressed MouseButton.Left then(
         if check_collision_point_rec (get_mouse_position ()) buttonywin then(
           ifwin:=false;
