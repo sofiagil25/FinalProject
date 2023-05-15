@@ -372,18 +372,8 @@ let board_tests =
         Board.placeobs brd;
         Board.placesol brd;
         solinboard brd) );
-    ( "assert creating obstacles with the same object twice will still result\n\
-      \        in the same simple grid"
-    >:: fun _ ->
-      assert (
-        (* let _ = Board.placeobs boarda in let _ = Board.placesol boarda in let
-           _ = Board.placeobs boardb in let _ = Board.placesol boardb in *)
-        Board.isboardsequalquestionmarksimple boarda boardb) );
-    (* ( "assert creating obstacles with the same object twice will still
-       result\n\ \ in the different full grid" >:: fun _ -> assert ( let brd4 =
-       Array.copy boardcoord in let _ = Board.placeobs brd4 in let brd5 =
-       Array.copy boardcoord in let _ = Board.placeobs brd5 in
-       Board.isboardsequalquestionmark brd4 brd5 = false) ); *)
+    ( "assert boarda and boardb are simply equal" >:: fun _ ->
+      assert (Board.isboardsequalquestionmarksimple boarda boardb) );
     ( "assert creating solutions with the same object twice will still result \
        in the different full grid"
     >:: fun _ ->
@@ -394,15 +384,46 @@ let board_tests =
         let _ = Board.placesol boardb in
         let _ = Board.printboard boarda in
         let _ = Board.printboard boardb in
-        (* let brd4 = Array.copy boardcoord in let _ = Board.placesol brd4 in
-           let brd5 = Array.copy boardcoord in let _ = Board.placeobs brd5 in *)
-        Board.isboardsequalquestionmark boarda boardb = false) )
-    (* ( "assert creating obstacles and solutions with the same object twice
-       will \ still result\n\ \ in the different full grid" >:: fun _ -> assert
-       ( let brd4 = Array.copy boardcoord in let _ = Board.placeobs brd4 in let
-       _ = Board.placesol brd4 in let brd5 = Array.copy boardcoord in let _ =
-       Board.placeobs brd5 in let _ = Board.placesol brd5 in
-       Board.isboardsequalquestionmark brd4 brd5 = false) ); *);
+        Board.isboardsequalquestionmark boarda boardb = false) );
+    ( "assert boarda and boardb are still simply equal" >:: fun _ ->
+      assert (
+        let _ = Board.placeobs boarda in
+        let _ = Board.placesol boarda in
+        let _ = Board.placeobs boardb in
+        let _ = Board.placesol boardb in
+        let _ = Board.printboard boarda in
+        let _ = Board.printboard boardb in
+        Board.isboardsequalquestionmarksimple boarda boardb) );
+    ( "assert solutions in boara" >:: fun _ ->
+      assert (
+        let _ = Board.placesol boarda in
+        let _ = Board.placesol boardb in
+        solinboard boarda) );
+    ( "assert solutions in boarb" >:: fun _ ->
+      assert (
+        let _ = Board.placesol boarda in
+        let _ = Board.placesol boardb in
+        solinboard boardb) );
+    ( "assert obstacles in boarda" >:: fun _ ->
+      assert (
+        let _ = Board.placeobs boarda in
+        let _ = Board.placeobs boardb in
+        obsinboard boarda) );
+    ( "assert obstacles in boardb" >:: fun _ ->
+      assert (
+        let _ = Board.placeobs boarda in
+        let _ = Board.placeobs boardb in
+        obsinboard boardb) );
+    ( "to_string test baby" >:: fun _ ->
+      assert (
+        let _ = Board.placeobs boarda in
+        let _ = Board.placeobs boardb in
+        obsinboard boardb) );
+    ( "to_string test larger" >:: fun _ ->
+      assert (
+        let _ = Board.placeobs boarda in
+        let _ = Board.placeobs boardb in
+        obsinboard boardb) );
   ]
 
 let suite = "Test suite for Minesweeper" >::: List.flatten [ board_tests ]

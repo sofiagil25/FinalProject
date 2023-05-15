@@ -183,12 +183,6 @@ let boxequal (b1 : box) (b2 : box) =
   && !(b1.obstacle) = !(b2.obstacle)
   && !(b1.solution) = !(b2.solution)
 
-(* returns true if to rows of boxes are equal *)
-(* let rowequal (r1 : box array) (r2 : box array) (equalfun : box -> box ->
-   bool) = if not (Array.length r1 == Array.length r2) then false else let x =
-   ref 0 in let vali = ref true in while !x < Array.length r1 && !vali do vali
-   := equalfun (Array.get r1 !x) (Array.get r2 !x); x := !x + 1 done; !vali *)
-
 let rowequal (r1 : box array) (r2 : box array) (equalfun : box -> box -> bool) =
   if not (Array.length r1 = Array.length r2) then false
   else
@@ -242,15 +236,24 @@ let isboardsequalquestionmark (b1 : box array array) (b2 : box array array) =
   else false
 
 let printline line row =
-  Array.iteri
-    (fun ind box ->
-      print_int row;
-      print_string ", ";
+  match Array.length line with
+  | 0 -> print_string ""
+  | _ ->
+      Array.iteri
+        (fun ind box ->
+          print_string "; (";
 
-      print_int ind;
-      print_int row;
-      print_string "= ";
-      print_string (string_of_bool !(box.obstacle)))
-    line
+          print_int row;
+          print_string ", ";
 
-let printboard board = Array.iteri (fun row line -> printline line row) board
+          print_int ind;
+          print_string ") ";
+
+          print_string "= ";
+          print_string (string_of_bool !(box.obstacle)))
+        line
+
+let printboard board =
+  match Array.length board with
+  | 0 -> print_string ""
+  | _ -> Array.iteri (fun row line -> printline line row) board

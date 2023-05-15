@@ -17,6 +17,7 @@ let setup () =
   let bomb = load_image "img/bomb.png" in
   let micheal_clarkson_mad = load_image "img/clarkson.jpeg" in
   let dexter_kozen = load_image "img/dexter.jpeg" in
+  let derek = load_image "img/derek.jpeg" in
 
   image_resize (addr micheal_clarkson) 200 200;
   (*used*)
@@ -26,6 +27,7 @@ let setup () =
   image_resize (addr micheal_clarkson_mad) 200 200;
   (*used*)
   image_resize (addr dexter_kozen) 200 200;
+  image_resize (addr derek) 200 200;
 
   let clarkson_texture = load_texture_from_image micheal_clarkson in
   let coin_texture = load_texture_from_image coin in
@@ -33,6 +35,7 @@ let setup () =
   let bomb_texture = load_texture_from_image bomb in
   let clarkson_mad_texture = load_texture_from_image micheal_clarkson_mad in
   let dexter_texture = load_texture_from_image dexter_kozen in
+  let derek_texture = load_texture_from_image derek in
 
   unload_image micheal_clarkson;
   unload_image coin;
@@ -40,6 +43,7 @@ let setup () =
   unload_image bomb;
   unload_image micheal_clarkson_mad;
   unload_image dexter_kozen;
+  unload_image derek;
   {
     textures =
       [
@@ -49,6 +53,7 @@ let setup () =
         bomb_texture;
         clarkson_mad_texture;
         dexter_texture;
+        derek_texture;
       ];
   }
 
@@ -224,6 +229,48 @@ let draw_hard_button () =
     ((screenwidth / 10) + 50)
     30 Color.red
 
+let draw_info_button () =
+  draw_rectangle
+    ((screenwidth / 2) - 350)
+    ((screenwidth / 10) + 500)
+    200 100 Color.blue;
+  draw_text "Learn"
+    ((screenwidth / 2) - 290)
+    ((screenwidth / 10) + 520)
+    30 Color.white;
+  draw_text "More"
+    ((screenwidth / 2) - 290)
+    ((screenwidth / 10) + 550)
+    30 Color.white
+
+let draw_team_button () =
+  draw_rectangle
+    ((screenwidth / 2) - 350)
+    ((screenwidth / 10) + 700)
+    200 100 Color.orange;
+  draw_text "Meet"
+    ((screenwidth / 2) - 290)
+    ((screenwidth / 10) + 720)
+    30 Color.white;
+  draw_text "Team"
+    ((screenwidth / 2) - 290)
+    ((screenwidth / 10) + 750)
+    30 Color.white
+
+let draw_exit_button () =
+  draw_rectangle
+    ((screenwidth / 2) - 500)
+    ((screenwidth / 10) - 100)
+    200 100 Color.red;
+  draw_text "Exit"
+    ((screenwidth / 2) - 440)
+    ((screenwidth / 10) - 80)
+    30 Color.white;
+  draw_text "To Menu"
+    ((screenwidth / 2) - 440)
+    ((screenwidth / 10) - 50)
+    30 Color.white
+
 let easy_button =
   Rectangle.create
     (float_of_int ((screenwidth / 2) - 300))
@@ -242,9 +289,30 @@ let hard_button =
     (float_of_int (screenwidth / 10))
     200. 100.
 
+let info_button =
+  Rectangle.create
+    (float_of_int ((screenwidth / 2) - 350))
+    (float_of_int ((screenwidth / 10) + 500))
+    200. 100.
+
+let team_button =
+  Rectangle.create
+    (float_of_int ((screenwidth / 2) - 350))
+    (float_of_int ((screenwidth / 10) + 700))
+    200. 100.
+
+let exit_button =
+  Rectangle.create
+    (float_of_int ((screenwidth / 2) - 500))
+    (float_of_int ((screenwidth / 10) - 100))
+    200. 100.
+
 let easystate = ref false
 let mediumstate = ref false
 let hardstate = ref false
+let info = ref false
+let team = ref false
+let menu = ref true
 
 let game_start () =
   started := true;
@@ -277,17 +345,38 @@ let eval_state () =
     easystate := true;
     edit_game := true;
     start_mode := false;
+    menu := false;
+    team := false;
+    info := false;
     easy_mode ())
   else if check_collision_point_rec (get_mouse_position ()) medium_button then (
     mediumstate := true;
     edit_game := true;
     start_mode := false;
+    menu := false;
+    team := false;
+    info := false;
     medium_mode ())
   else if check_collision_point_rec (get_mouse_position ()) hard_button then (
     hardstate := true;
     edit_game := true;
     start_mode := false;
+    menu := false;
+    team := false;
+    info := false;
     game_start ())
+  else if check_collision_point_rec (get_mouse_position ()) info_button then (
+    menu := false;
+    team := false;
+    info := true)
+  else if check_collision_point_rec (get_mouse_position ()) team_button then (
+    menu := false;
+    team := true;
+    info := false)
+
+let eval_exit () =
+  if check_collision_point_rec (get_mouse_position ()) exit_button then
+    menu := true
 
 let buttonn =
   Rectangle.create
@@ -440,7 +529,123 @@ let draw_beginning_screen () =
   draw_instructions ();
   draw_easy_button ();
   draw_medium_button ();
-  draw_hard_button ()
+  draw_hard_button ();
+  draw_info_button ();
+  draw_team_button ()
+
+let draw_team () =
+  clear_background Color.beige;
+  draw_exit_button ();
+  draw_text "Sofia is a computer science major from New York State." 300 150 25
+    Color.black;
+  draw_text "She LOVES mindsweeper, reading, and listening to sad" 300 175 25
+    Color.black;
+  draw_text "music. She also enjoys doing cryptic crosswords! She" 300 200 25
+    Color.black;
+  draw_text "is pictured here holding a small bird." 300 225 25 Color.black;
+  draw_text "" 300 250 25 Color.black;
+  draw_text "" 300 275 25 Color.black;
+  draw_text "Hi! My name is Lauren Lee and i’m a sophomore in biomedical" 300
+    300 25 Color.black;
+  draw_text "engineering. I just really love OCaml probably more than " 300 325
+    25 Color.black;
+  draw_text "anything so I decided to take this class! Go big red!" 300 350 25
+    Color.black;
+  draw_text "" 300 375 25 Color.black;
+  draw_text "" 300 400 25 Color.black;
+  draw_text "Hey I'm Derek, a freshman doing computer science. I love" 300 425
+    25 Color.black;
+  draw_text "eating cheesecake and doing OCaml in my free time! I'm a" 300 450
+    25 Color.black;
+  draw_text "big Florida Panthers fan!" 300 475 25 Color.black;
+  draw_text "" 300 500 25 Color.black;
+  draw_text "" 300 520 25 Color.black;
+  draw_text "Aneesha kodati is a sophomore studying computer science" 300 550 25
+    Color.black;
+  draw_text "in the College of Engineering. When she’s not coding in" 300 575 25
+    Color.black;
+  draw_text "OCAML, she likes to dance or code more for CUAIR!" 300 600 25
+    Color.black
+
+let draw_info () : unit =
+  clear_background Color.beige;
+  draw_exit_button ();
+  draw_text
+    "Minesweeper is a classic puzzle video game that has been popularized on \
+     various computer platforms."
+    100 100 25 Color.black;
+  draw_text
+    "The objective of the game is to clear a rectangular grid containing \
+     hidden mines without detonating any of them."
+    100 125 25 Color.black;
+  draw_text
+    "The player must strategically uncover squares on the grid, with each \
+     square either revealing a number indicating the number of adjacent mines \
+     or being empty."
+    100 150 25 Color.black;
+  draw_text
+    "By using the revealed numbers as clues, the player must deduce the \
+     locations of the mines and mark them with flags."
+    100 175 25 Color.black;
+  draw_text "" 100 200 25 Color.black;
+  draw_text
+    "The history of Minesweeper dates back to the 1960s when it originated as \
+     a mainframe computer game called \"Cube.\""
+    100 225 25 Color.black;
+  draw_text
+    "However, the version we are most familiar with today was developed for \
+     the Microsoft Windows operating system."
+    100 250 25 Color.black;
+  draw_text
+    "Minesweeper was introduced as a part of the Windows Entertainment Pack in \
+     1990, bundled with other simple games."
+    100 275 25 Color.black;
+  draw_text "" 100 300 25 Color.black;
+  draw_text
+    "The popularity of Minesweeper soared with the release of Windows 3.1 in \
+     1992, as it was included as a standard pre-installed game."
+    100 325 25 Color.black;
+  draw_text
+    "It quickly became a beloved pastime for many Windows users, offering a \
+     challenging and addictive gameplay experience."
+    100 350 25 Color.black;
+  draw_text "" 100 375 25 Color.black;
+  draw_text
+    "The mechanics and rules of Minesweeper are relatively straightforward, \
+     making it accessible to players of all ages."
+    100 400 25 Color.black;
+  draw_text
+    "Its popularity grew further due to its inclusion in subsequent Windows \
+     versions, ensuring its availability to a wide audience."
+    100 425 25 Color.black;
+  draw_text
+    "The game's simplicity, coupled with its puzzle-solving aspect, has made \
+     it a favorite time-killer for many."
+    100 450 25 Color.black;
+  draw_text "" 100 475 25 Color.black;
+  draw_text "Minesweeper's influence also extended beyond the Windows platform."
+    100 500 25 Color.black;
+  draw_text
+    "It was adapted for various other operating systems, including macOS, \
+     Linux, and mobile platforms."
+    100 525 25 Color.black;
+  draw_text
+    "Numerous clones and variants of the game were developed for different \
+     devices and gaming platforms, contributing to its enduring appeal."
+    100 550 25 Color.black;
+  draw_text "" 100 575 25 Color.black;
+  draw_text
+    "While Minesweeper might not boast the graphical sophistication or \
+     complexity of modern games,"
+    100 600 25 Color.black;
+  draw_text
+    "its strategic gameplay and addictive nature have allowed it to stand the \
+     test of time."
+    100 625 25 Color.black;
+  draw_text
+    "It remains a beloved and iconic game in the history of computer gaming, \
+     recognized for its simplicity, logical thinking requirements, and"
+    100 650 25 Color.black
 
 let lose textures =
   drawGrid (Board.boardwithvalue !thisgameboard);
@@ -526,8 +731,10 @@ let rec loop () info_packet =
     let elapsed_time = Raylib.get_time () -. !currstarttime in
     let time_left = int_of_float !currtotaltime - int_of_float elapsed_time in
     begin_drawing ();
-    if !start_mode = true then
-      if is_mouse_button_pressed MouseButton.Left then eval_state ();
+    if !start_mode = true && !menu = true then (
+      if is_mouse_button_pressed MouseButton.Left then eval_state ())
+    else if !start_mode = true && (!info = true || !team = true) then
+      if is_mouse_button_pressed MouseButton.Left then eval_exit ();
     if !started = true && !ifwin = false && time_left >= 0 then (
       draw_stats ();
       draw_time
@@ -550,9 +757,17 @@ let rec loop () info_packet =
         if is_mouse_button_pressed MouseButton.Left then
           let mouse_pos = get_mouse_position in
           findCollision (mouse_pos ())))
-    else if !ifwin = false && !started = false then (
+    else if !ifwin = false && !started = false && !menu = true then (
       draw_beginning_screen ();
       clear_background Color.white)
+    else if !ifwin = false && !started = false && !info = true then (
+      Raylib.clear_background Color.black;
+      draw_info ();
+      if is_mouse_button_pressed MouseButton.Left then eval_exit ())
+    else if !ifwin = false && !started = false && !team = true then (
+      Raylib.clear_background Color.black;
+      draw_team ();
+      if is_mouse_button_pressed MouseButton.Left then eval_exit ())
     else if time_left < 0 then (
       lose info_packet.textures;
       if is_mouse_button_pressed MouseButton.Left then
