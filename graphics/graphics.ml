@@ -347,24 +347,24 @@ let restart_game () =
   alive := true;
   currstarttime := Raylib.get_time ();
   if(!easystate=true) then (
-    currtotaltime:=30.;
+    currtotaltime:=100.;
     (* currx:=5; *)
     (* curry:=5; *)
-    (* currprob:=20; *)
+     currprob:=20; 
     thisgameboard:=Board.newboard !currx !curry !currprob;
   )
   else if !mediumstate=true then (
-    currtotaltime:=40.;
+    currtotaltime:=45.;
     (* currx:=10; *)
     (* curry:=10; *)
-    (* currprob:=30; *)
+     currprob:=30; 
     thisgameboard:=Board.newboard !currx !curry !currprob; 
   )
   else (
-    currtotaltime:=100.;
+    currtotaltime:=30.;
     (* currx:=20; *)
     (* curry:=20; *)
-    (* currprob:=40; *)
+    currprob:=40; 
     thisgameboard:=Board.newboard !currx !curry !currprob; );
   drawGrid (Board.boardwithvalue (!thisgameboard))
 
@@ -398,6 +398,7 @@ let draw_time orig_seconds remaining_seconds =
   | 3 -> draw_text "THREE SECS LEFT" 650 450 50 Color.red
   | 2 -> draw_text "TWOOOOOOO" 650 450 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" 650 450 50 Color.red
+  | 0 -> draw_text "YOU LOSSEEEEEE" 650 450 50 Color.red
   | _ -> draw_text (string_of_int remaining_seconds) 650 450 50 Color.red
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
@@ -405,18 +406,17 @@ let rec loop () =
     let open Raylib in
     let elapsed_time = Raylib.get_time () -. !currstarttime 
   in
+    let time_left = int_of_float !currtotaltime - int_of_float elapsed_time 
+  in
     begin_drawing ();
     if(!start_mode=true)then (
       if is_mouse_button_pressed MouseButton.Left then eval_state(); 
-      (* print_string("checking eval state"); *)
     );
-    (* if(!edit_game=true) then (thisgameboard:=Board.newboard !currx !curry !currprob; edit_game:=false;       *)
-    (* print_string("rewriting gameboard")); *)
-
-    if !started = true && !ifwin = false then (
+    if !started = true && !ifwin = false && time_left >=0 then (
       draw_stats ();
       draw_time
-        ((elapsed_time |> int_of_float) + (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0))
+       ((elapsed_time |> int_of_float) + 
+       (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0))
        (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
       if not !alive then (
         clear_background Color.raywhite;
@@ -436,10 +436,22 @@ let rec loop () =
         if is_mouse_button_pressed MouseButton.Left then
           let mouse_pos = get_mouse_position in
           findCollision (mouse_pos ())))
-    else if !ifwin = false then (
-      draw_beginning_screen ();
-      clear_background Color.white)
-    else draw_win ();
+    else if !ifwin = false && !started=false then (
+          draw_beginning_screen ();
+          clear_background Color.white)
+    else if time_left<0 then(
+          clear_background Color.raywhite;
+          drawGrid (Board.boardwithvalue !thisgameboard);
+          draw_lose ();
+          if is_mouse_button_pressed MouseButton.Left then
+          if check_collision_point_rec (get_mouse_position ()) buttony then
+            restart_game ()
+          else if check_collision_point_rec (get_mouse_position ()) buttonn then
+          quit_game ())
+ 
+    else if time_left>=0 then 
+      draw_win ();
+   
 
     end_drawing ();
     loop ()
