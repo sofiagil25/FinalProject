@@ -115,7 +115,7 @@ let makeboard (b : box array array) = { base = b }
 (* getsol box is a returns whether a box is an solution *)
 let getsol (box : box) = !(box.solution)
 
-(* let issolution (board : board) (x : int) (y : int) = getsol (Array.get
+let issolution (board : board) (x : int) (y : int) = getsol (Array.get
    (Array.get board.base y) x)
 
 let isobstacle (board : board) (x : int) (y : int) =
