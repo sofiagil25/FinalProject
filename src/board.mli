@@ -32,3 +32,5 @@ val printboard : box array array -> unit
 val issolution : board -> int -> int -> bool
 val isobstacle : board -> int -> int -> bool
 val makeboard : box array array -> board
+val to_string_count : box array array -> string
+val to_string_flag : box array array -> string

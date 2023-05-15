@@ -440,20 +440,77 @@ let board_tests =
         let _ = Board.placeobs boarda in
         let _ = Board.placeobs boardb in
         obsinboard boardb) );
-    ( "assert obstacles in boardb" >:: fun _ ->
+    ( "assert obstacles in boardo" >:: fun _ ->
       assert (
         let _ = Board.placeobs bo in
         Board.isobstacle (Board.makeboard bo) 0 0
         || Board.isobstacle (Board.makeboard bo) 0 1
         || Board.isobstacle (Board.makeboard bo) 1 0
         || Board.isobstacle (Board.makeboard bo) 1 1) );
-    ( "assert obstacles in boardb" >:: fun _ ->
+    ( "assert solutions in boardo" >:: fun _ ->
       assert (
         let _ = Board.placesol bo in
         Board.issolution (Board.makeboard bo) 0 0
         || Board.issolution (Board.makeboard bo) 0 1
         || Board.issolution (Board.makeboard bo) 1 0
         || Board.issolution (Board.makeboard bo) 1 1) );
+    ( "assert obstacles not in boardc" >:: fun _ ->
+      assert (
+        not
+          (Board.issolution (Board.makeboard bc) 0 0
+          || Board.issolution (Board.makeboard bc) 0 1
+          || Board.issolution (Board.makeboard bc) 1 0
+          || Board.issolution (Board.makeboard bc) 1 1)) );
+    ( "assert solutions not in boardc" >:: fun _ ->
+      assert (
+        not
+          (Board.issolution (Board.makeboard bc) 0 0
+          || Board.issolution (Board.makeboard bc) 0 1
+          || Board.issolution (Board.makeboard bc) 1 0
+          || Board.issolution (Board.makeboard bc) 1 1)) );
+    ( "assert boardc and boardo are simply equal" >:: fun _ ->
+      assert (Board.isboardsequalquestionmarksimple bc bo) );
+    ( "assert boardc and boardo are not equal" >:: fun _ ->
+      assert (not (Board.isboardsequalquestionmark bc bo)) );
+    ( "assert to_string_count of small board is correct" >:: fun _ ->
+      assert (
+        Board.to_string_count bo
+        = "[[[Count of (0, 0) = 0; Count of (0, 1) = 0]]; [[Count of (1, 0) = \
+           0; Count of (1, 1) = 0]]]") );
+    ( "assert to_string_count of large board is correct" >:: fun _ ->
+      assert (
+        Board.to_string_count boardwithbomblarge
+        = "[[[Count of (0, 0) = 0; Count of (0, 1) = 0; Count of (0, 2) = 0; \
+           Count of (0, 3) = 0; Count of (0, 4) = 0; Count of (0, 5) = 0; \
+           Count of (0, 6) = 0; Count of (0, 7) = 0; Count of (0, 8) = 0; \
+           Count of (0, 9) = 0; Count of (0, 10) = 0]]; [[Count of (1, 0) = 0; \
+           Count of (1, 1) = 0; Count of (1, 2) = 0; Count of (1, 3) = 0; \
+           Count of (1, 4) = 0; Count of (1, 5) = 0; Count of (1, 6) = 0; \
+           Count of (1, 7) = 0; Count of (1, 8) = 0; Count of (1, 9) = 0; \
+           Count of (1, 10) = 0]]; [[Count of (2, 0) = 0; Count of (2, 1) = 0; \
+           Count of (2, 2) = 0; Count of (2, 3) = 0; Count of (2, 4) = 0; \
+           Count of (2, 5) = 0; Count of (2, 6) = 0; Count of (2, 7) = 0; \
+           Count of (2, 8) = 0; Count of (2, 9) = 0; Count of (2, 10) = 0]]; \
+           [[Count of (3, 0) = 0; Count of (3, 1) = 0; Count of (3, 2) = 0; \
+           Count of (3, 3) = 0; Count of (3, 4) = 0; Count of (3, 5) = 0; \
+           Count of (3, 6) = 0; Count of (3, 7) = 0; Count of (3, 8) = 0; \
+           Count of (3, 9) = 0; Count of (3, 10) = 0]]; [[Count of (4, 0) = 0; \
+           Count of (4, 1) = 0; Count of (4, 2) = 0; Count of (4, 3) = 0; \
+           Count of (4, 4) = 0; Count of (4, 5) = 0; Count of (4, 6) = 0; \
+           Count of (4, 7) = 0; Count of (4, 8) = 0; Count of (4, 9) = 0; \
+           Count of (4, 10) = 0]]]") );
+    ( "assert to_string_flag of small board is correct" >:: fun _ ->
+      assert (
+        Board.to_string_flag bo
+        = "[[[Flag of (0, 0) = false; Flag of (0, 1) = false]]; [[Flag of (1, \
+           0) = false; Flag of (1, 1) = false]]]") );
+    ( "assert to_string_flag of small board with different solution values is \
+       correct"
+    >:: fun _ ->
+      assert (
+        Board.to_string_flag bc
+        = "[[[Flag of (0, 0) = false; Flag of (0, 1) = false]]; [[Flag of (1, \
+           0) = false; Flag of (1, 1) = false]]]") );
   ]
 
 let suite = "Test suite for Minesweeper" >::: List.flatten [ board_tests ]
