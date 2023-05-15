@@ -71,8 +71,8 @@ let setup () =
       ];
   }
 
-let currx = ref 4
-let curry = ref 4
+let currx = ref 8
+let curry = ref 8
 let flagstate = ref false
 
 let edit_game = ref false
@@ -465,7 +465,7 @@ let draw_lose textures =
     ((Array.length !thisgameboard * boxWidth / 2) + 110)
     ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
     50 Color.black;
-  draw_texture (List.nth textures 2) 500 200 Color.raywhite
+  draw_texture (List.nth textures 6) 500 200 Color.raywhite
 
 let close = ref false
 
