@@ -115,8 +115,8 @@ let makeboard (b : box array array) = { base = b }
 (* getsol box is a returns whether a box is an solution *)
 let getsol (box : box) = !(box.solution)
 
-(* let issolution (board : board) (x : int) (y : int) = getsol (Array.get
-   (Array.get board.base y) x)
+let issolution (board : board) (x : int) (y : int) =
+  getsol (Array.get (Array.get board.base y) x)
 
 let isobstacle (board : board) (x : int) (y : int) =
   getobs (Array.get (Array.get board.base y) x)
@@ -243,25 +243,38 @@ let isboardsequalquestionmark (b1 : box array array) (b2 : box array array) =
     iter 0 (Array.length b1) true
   else false
 
-let string_of_box box = string_of_int box.count
+let string_of_box_count box = string_of_int box.count
+let string_of_box_flag box = string_of_bool !(box.flag)
 
-let rec line_to_string line row =
+let rec line_to_string line (row : int) (name : string) (funct : box -> string)
+    =
   let str = ref "[" in
   for i = 0 to Array.length line - 1 do
     if i > 0 then str := !str ^ "; ";
-    str := !str ^ "[";
-    str := !str ^ "(" ^ row ^ ", " ^ string_of_int i ^ ") =";
-    str := !str ^ string_of_box (Array.get line i);
-    str := !str ^ "]"
+    str :=
+      !str ^ name ^ " of (" ^ string_of_int row ^ ", " ^ string_of_int i
+      ^ ") = ";
+    str := !str ^ funct (Array.get line i)
   done;
   !str ^ "]"
 
-let to_string board acc =
+let to_string_count (board : box array array) =
   let str = ref "[" in
   for i = 0 to Array.length board - 1 do
     if i > 0 then str := !str ^ "; ";
     str := !str ^ "[";
-    str := !str ^ string_of_box (Array.get board i);
+    str :=
+      !str ^ line_to_string (Array.get board i) i "Count" string_of_box_count;
+    str := !str ^ "]"
+  done;
+  !str ^ "]"
+
+let to_string_flag (board : box array array) =
+  let str = ref "[" in
+  for i = 0 to Array.length board - 1 do
+    if i > 0 then str := !str ^ "; ";
+    str := !str ^ "[";
+    str := !str ^ line_to_string (Array.get board i) i "Flag" string_of_box_flag;
     str := !str ^ "]"
   done;
   !str ^ "]"
