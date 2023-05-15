@@ -11,6 +11,7 @@ let setup () =
 let currx = ref 5
 let curry = ref 5
 let currprob = ref 25
+let currstarttime = ref 0.
 let thisgameboard = ref (Board.newboard !currx !curry !currprob)
 let started = ref false
 let top_bar_size = 250
@@ -242,6 +243,10 @@ let draw_stats () =
        (Array.length !thisgameboard * Array.length (Array.get !thisgameboard 0)))
     550 450 50 Color.black
 
+let game_start () =
+  started := true;
+  currstarttime := Raylib.get_time ()
+
 let restart_game () =
   clear_background Color.white;
   thisgameboard := Board.newboard !currx !curry 15;
@@ -249,12 +254,19 @@ let restart_game () =
   resetBoard 0 0;
   started := true;
   alive := true;
+  currstarttime := Raylib.get_time ();
   drawGrid (Board.boardwithvalue !thisgameboard)
 
 let quit_game () =
   end_drawing ();
   started := true;
   close := true
+
+let draw_win () =
+  clear_background Color.raywhite;
+  draw_text "YIPEEEEEEEEEEEEEEEEEEEEEEEEEEEEE" 50 50 100 Color.black
+
+let ifwin = ref false
 
 let draw_instructions () =
   clear_background Color.orange;
@@ -265,13 +277,15 @@ let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let open Raylib in
+    let elapsed_time = Raylib.get_time () -. !currstarttime in
+    let remaining_seconds = max (!currprob - int_of_float elapsed_time) 0 in
     begin_drawing ();
-    draw_instructions ();
     if is_mouse_button_pressed MouseButton.Left then
       if check_collision_point_rec (get_mouse_position ()) start_button then
-        started := true;
-    if !started = true then (
+        game_start ();
+    if !started = true && !ifwin = false then (
       draw_stats ();
+      Raylib.draw_text (string_of_int remaining_seconds) 650 450 50 Color.red;
       if not !alive then (
         clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
@@ -282,15 +296,19 @@ let rec loop () =
           else if check_collision_point_rec (get_mouse_position ()) buttonn then
             quit_game ())
       else if is_cursor_on_screen () then (
-        if (!currx * !curry) - countuncovered () = countbombs () then
-          draw_text "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" 50 50 100 Color.black
+        if (!currx * !curry) - countuncovered () = countbombs () then (
+          ifwin := true;
+          draw_text "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" 50 50 100 Color.black)
         else clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
         if is_mouse_button_pressed MouseButton.Left then
           let mouse_pos = get_mouse_position in
           findCollision (mouse_pos ())))
-    else draw_start_button ();
-    clear_background Color.white;
+    else if !ifwin = false then (
+      draw_instructions ();
+      draw_start_button ();
+      clear_background Color.white)
+    else draw_win ();
 
     end_drawing ();
     loop ()
