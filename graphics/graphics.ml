@@ -368,22 +368,29 @@ let quit_game () =
 
 let draw_win () =
   clear_background Color.raywhite;
-  draw_text "YIPEEEEEEE \n YOU WON" 50 50 100 Color.pink;
+  draw_rectangle
+  (top_bar_size) (top_bar_size) 200 100 Color.pink;
+  draw_rectangle
+  (top_bar_size+210) (top_bar_size) 200 100 Color.pink;
+  draw_text "YIPEEEEEEE, YOU WON" (top_bar_size-100) 
+  (top_bar_size-200) 50 Color.pink;
   draw_text "another challenge?"
-  ((Array.length !thisgameboard * boxWidth / 3) + 60)
-  ((Array.length (Array.get !thisgameboard 0) * boxWidth / 3) + 70)
-  40 Color.orange;
+  (top_bar_size-190) (top_bar_size-150) 25 Color.pink;
   draw_text "ye"
-  (Array.length !thisgameboard * boxWidth / 3)
-  ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
+  (top_bar_size+10)(top_bar_size)
   50 Color.black;
   draw_text "nah"
-  ((Array.length !thisgameboard * boxWidth / 2) + 110)
-  ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
+  (top_bar_size+220)(top_bar_size)
   50 Color.black
+
+let buttonywin =
+    Rectangle.create
+    ((top_bar_size)|>float_of_int) ((top_bar_size)|> float_of_int)200. 100.
   
-
-
+let buttonnwin =
+      Rectangle.create
+      ((top_bar_size+210)|>float_of_int) ((top_bar_size)|> float_of_int)200. 100.
+  
 let ifwin = ref false
 
 let draw_instructions () =
@@ -501,10 +508,10 @@ let rec loop () =
     else if time_left>=0 then (
       draw_win();
       if is_mouse_button_pressed MouseButton.Left then(
-        if check_collision_point_rec (get_mouse_position ()) buttony then(
+        if check_collision_point_rec (get_mouse_position ()) buttonywin then(
           ifwin:=false;
           restart_game ())
-        else if check_collision_point_rec (get_mouse_position ()) buttonn then(
+        else if check_collision_point_rec (get_mouse_position ()) buttonnwin then(
           ifwin:=false;
           quit_game ())
       ));
