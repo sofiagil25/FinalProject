@@ -117,3 +117,6 @@ let isboardsequalquestionmark (b1 : box array array) (b2 : box array array) =
     row := !row + 1
   done;
   !vali
+
+
+

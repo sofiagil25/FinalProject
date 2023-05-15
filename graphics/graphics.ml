@@ -348,22 +348,16 @@ let restart_game () =
   currstarttime := Raylib.get_time ();
   if(!easystate=true) then (
     currtotaltime:=100.;
-    (* currx:=5; *)
-    (* curry:=5; *)
      currprob:=20; 
     thisgameboard:=Board.newboard !currx !curry !currprob;
   )
   else if !mediumstate=true then (
     currtotaltime:=45.;
-    (* currx:=10; *)
-    (* curry:=10; *)
      currprob:=40; 
     thisgameboard:=Board.newboard !currx !curry !currprob; 
   )
   else (
-    currtotaltime:=30.;
-    (* currx:=20; *)
-    (* curry:=20; *)
+    currtotaltime:=31.;
     currprob:=40; 
     thisgameboard:=Board.newboard !currx !curry !currprob; );
   drawGrid (Board.boardwithvalue (!thisgameboard))
@@ -405,12 +399,17 @@ intoftime/2
 
 let draw_time orig_seconds remaining_seconds =
   let ycoord = top_bar_size-50 in
-  let offset=70 in
+  let offset=30 in
   let xcoord=top_bar_size+offset in 
-  draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
-  if(!easystate=true) then
+  if (!currtotaltime=30.) then
+    match remaining_seconds with 
+    | _ -> draw_text "Practice ends in " (xcoord) (ycoord-50) 40 Color.red;
+    draw_text (string_of_int remaining_seconds) (xcoord+100) ycoord 50 Color.red
+  else if(!easystate=true) then(
+    draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+
   match remaining_seconds with
-  | 75 ->  draw_text "25% there. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 75 ->  draw_text "25% there. you got this." (xcoord+offset) ycoord 30 Color.red
   | 50 ->  draw_text "HALF TIMEEEEEE" (xcoord+offset) ycoord 50 Color.red
   | 20 -> draw_text "20 SECS LEFT" (xcoord+offset) ycoord 50 Color.red
   | 10 -> draw_text "10 SECS LEFT!!!!" (xcoord+offset) ycoord 50 Color.red
@@ -420,33 +419,37 @@ let draw_time orig_seconds remaining_seconds =
   | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
   | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
-  else if(!mediumstate=true) then
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
+  else if(!mediumstate=true) then(
+    draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+
   match remaining_seconds with
   | 22 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
-  | 10 -> draw_text "75% there. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 10 -> draw_text "75% there. you got this." (xcoord+offset) ycoord 30 Color.red
   | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
   | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
   | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
   | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
   | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
 else if(!hardstate=true) then
+  (draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+
   match remaining_seconds with
   | 15 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
-  | 10 -> draw_text "10 seconds. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 10 -> draw_text "10 seconds. you got this." (xcoord+offset) ycoord 30 Color.red
   | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
   | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
   | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
   | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
-  | 0 -> draw_text "YOU LOSE. it's ok that was hard." (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
+  | 0 -> draw_text "YOU LOSE. it's ok that was hard." (xcoord+70) ycoord 20 Color.red
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
+
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
-    let open Raylib in
     let elapsed_time = Raylib.get_time () -. !currstarttime 
   in
     let time_left = int_of_float !currtotaltime - int_of_float elapsed_time 
@@ -484,7 +487,6 @@ let rec loop () =
           clear_background Color.white)
     else if time_left<0 then
       lose()
- 
     else if time_left>=0 then 
       draw_win ();
     end_drawing ();
