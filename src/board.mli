@@ -19,7 +19,12 @@ val ismine : box array array -> int -> int -> int
 (* val getval : box -> int *)
 
 val getcount : box array array -> int -> int -> int
+val getobs : box -> bool
+val getsol : box -> bool
 val boardwithvalue : box array array -> box array array
 val getflag : box array array -> int -> int -> bool
 val setflag : box array array -> int -> int -> unit
 val isboardsequalquestionmark : box array array -> box array array -> bool
+val isboardsequalquestionmarksimple : box array array -> box array array -> bool
+val placeobs : box array array -> unit
+val placesol : box array array -> unit
