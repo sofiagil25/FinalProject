@@ -280,10 +280,32 @@ let boardb =
   |> Array.append (Array.make 1 row1b)
   |> Array.append (Array.make 1 topofb)
 
+(* two by two board environment to test obstacles and solutions *)
+let row1o =
+  Array.copy (babyarrayobs 0 1 0 false)
+  |> Array.append (Array.copy (babyarrayobs 0 0 0 false))
+
+let row2o =
+  Array.copy (babyarrayobs 1 1 0 false)
+  |> Array.append (Array.copy (babyarrayobs 1 0 0 false))
+
+let row1c =
+  Array.copy (babyarrayobs 0 1 0 false)
+  |> Array.append (Array.copy (babyarrayobs 0 0 0 false))
+
+let row2c =
+  Array.copy (babyarrayobs 1 1 0 false)
+  |> Array.append (Array.copy (babyarrayobs 1 0 0 false))
+
+let bo = Array.make 1 row2o |> Array.append (Array.make 1 row1o)
+let bc = Array.make 1 row2c |> Array.append (Array.make 1 row1c)
+
 let board_tests =
   [
     ( "test equals with same object" >:: fun _ ->
       assert (Board.isboardsequalquestionmarksimple emptyboard emptyboard) );
+    ( "test not equals with objects of different size" >:: fun _ ->
+      assert (Board.isboardsequalquestionmarksimple emptyboard boardcoord) );
     ( "test equals with different object" >:: fun _ ->
       assert (Board.isboardsequalquestionmarksimple emptyboard zeroprobboard) );
     ( "test equals with non square boards" >:: fun _ ->
@@ -322,9 +344,9 @@ let board_tests =
       assert (
         Board.isboardsequalquestionmark boardwithbomb boardwithbomblarge
         == false) );
-    (* ( "test set_flag fail" >:: fun _ -> let brd3 = Array.copy
-       boardwithbomblarge in let _ = Board.setflag brd3 2 3 in assert
-       (Board.getflag brd3 2 3 = false) ); *)
+    ( "test set_flag fail" >:: fun _ ->
+      let _ = Board.setflag boarda 2 3 in
+      assert (Board.getflag boardb 2 3 = false) );
     ( "test is_mine true" >:: fun _ ->
       assert (Board.ismine boardwithflag 2 3 == -1) );
     ("test is_mine false" >:: fun _ -> assert (Board.ismine boardcoord 2 3 == 0));
@@ -334,6 +356,10 @@ let board_tests =
       assert (checkboardrandom 25 25 100 == false) );
     ( "test random board always same for prob 0" >:: fun _ ->
       assert (checkboardrandom 25 25 0 == false) );
+    ( "test random board always same for prob 0 with different sizes"
+    >:: fun _ -> assert (checkboardrandom 25 35 0 == false) );
+    ( "assert random board with different sizes" >:: fun _ ->
+      assert (checkboardrandom 25 35 50) );
     ( "test no obs or sol when not called" >:: fun _ ->
       assert (ifobsthensolution (Board.newboard 11 5 100)) );
     ( "test no obs or sol when called with percentage >>50" >:: fun _ ->
@@ -414,16 +440,20 @@ let board_tests =
         let _ = Board.placeobs boarda in
         let _ = Board.placeobs boardb in
         obsinboard boardb) );
-    ( "to_string test baby" >:: fun _ ->
+    ( "assert obstacles in boardb" >:: fun _ ->
       assert (
-        let _ = Board.placeobs boarda in
-        let _ = Board.placeobs boardb in
-        obsinboard boardb) );
-    ( "to_string test larger" >:: fun _ ->
+        let _ = Board.placeobs bo in
+        Board.isobstacle (Board.makeboard bo) 0 0
+        || Board.isobstacle (Board.makeboard bo) 0 1
+        || Board.isobstacle (Board.makeboard bo) 1 0
+        || Board.isobstacle (Board.makeboard bo) 1 1) );
+    ( "assert obstacles in boardb" >:: fun _ ->
       assert (
-        let _ = Board.placeobs boarda in
-        let _ = Board.placeobs boardb in
-        obsinboard boardb) );
+        let _ = Board.placesol bo in
+        Board.issolution (Board.makeboard bo) 0 0
+        || Board.issolution (Board.makeboard bo) 0 1
+        || Board.issolution (Board.makeboard bo) 1 0
+        || Board.issolution (Board.makeboard bo) 1 1) );
   ]
 
 let suite = "Test suite for Minesweeper" >::: List.flatten [ board_tests ]
