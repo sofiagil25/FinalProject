@@ -20,11 +20,11 @@ let setup () =
   let micheal_clarkson_mad = load_image "img/clarkson.jpeg" in
   let dexter_kozen = load_image "img/dexter.jpeg" in
 
-  image_resize (addr micheal_clarkson) 200 200;
+  image_resize (addr micheal_clarkson) 200 200; (*used*)
   image_resize (addr coin) 200 200;
   image_resize (addr heart) 200 200;
   image_resize (addr bomb) 200 200;
-  image_resize (addr micheal_clarkson_mad) 200 200;
+  image_resize (addr micheal_clarkson_mad) 200 200; (*used*)
   image_resize (addr dexter_kozen) 200 200;
 
   let clarkson_texture = load_texture_from_image micheal_clarkson in
@@ -309,7 +309,7 @@ let buttonn =
     (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
     200. 100.
 
-let draw_lose () =
+let draw_lose textures =
   draw_text "you are a loser :c"
     ((Array.length !thisgameboard * boxWidth / 3) - 50)
     (Array.length (Array.get !thisgameboard 0) * boxWidth / 3)
@@ -333,7 +333,10 @@ let draw_lose () =
   draw_text "nah"
     ((Array.length !thisgameboard * boxWidth / 2) + 110)
     ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
-    50 Color.black
+    50 Color.black;
+  draw_texture (List.nth (textures) 2) 500 200  Color.raywhite
+
+  
 
 let close = ref false
 
@@ -443,18 +446,20 @@ let ifwin = ref false
 
 let draw_instructions () =
   clear_background Color.green;
-  draw_text "Instructions: the thing does the thing" 50 50 30 Color.black;
-  draw_text "Press any box to start playing" 350 650 30 Color.black
+  draw_text "Press a start button to start playing" 350 650 30 Color.black;
+  draw_text "Instructions: The numbers in the gray boxes correspond" 50 ((screenwidth / 10)+120) 30 Color.black;
+  draw_text "to the amount of mines directly touching that box (adjacent)" 50 ((screenwidth / 10)+155) 30 Color.black;
+  draw_text "If the timer runs out, or you click a bomb, you lose!" 50 ((screenwidth / 10)+190) 30 Color.black
 
 let draw_beginning_screen () =
   draw_instructions ();
   draw_easy_button ();
   draw_medium_button ();
   draw_hard_button ()
-let lose () = 
+let lose textures = 
   drawGrid (Board.boardwithvalue !thisgameboard);
   clear_background Color.raywhite;
-  draw_lose ()
+  draw_lose textures
  
 let halftime()=
   let intoftime =(!currtotaltime)|>int_of_float 
@@ -528,7 +533,7 @@ let rec loop () info_packet=
        (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0))
        (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
       if not !alive then (
-        lose();
+        lose info_packet.textures;
         if is_mouse_button_pressed MouseButton.Left then
           if check_collision_point_rec (get_mouse_position ()) buttony then
             restart_game ()
@@ -547,7 +552,7 @@ let rec loop () info_packet=
           draw_beginning_screen ();
           clear_background Color.white)
     else if time_left<0 then(
-      lose();
+      lose info_packet.textures;
       if is_mouse_button_pressed MouseButton.Left then
         if check_collision_point_rec (get_mouse_position ()) buttony then
           restart_game ()
@@ -563,9 +568,10 @@ let rec loop () info_packet=
           ifwin:=false;
           quit_game ())
       ));
-    
+
 
     end_drawing ();
-    loop (){textures = info_packet.textures;}
+    loop ()
+      {textures = info_packet.textures;}
 
 let () = setup () |> loop()
