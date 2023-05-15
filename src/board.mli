@@ -31,3 +31,4 @@ val placesol : box array array -> unit
 val printboard : box array array -> unit
 val issolution : board -> int -> int -> bool
 val isobstacle : board -> int -> int -> bool
+val makeboard : box array array -> board
