@@ -33,8 +33,6 @@ let rec newboard width height prob : box array array =
 
 let ismine (game : box array array) x y = game.(x).(y).bomb
 let isminebool game x y = if ismine game x y < 0 then true else false
-
-(* let getval (b : box) = b.bomb *)
 let getbox col row board = Array.get (Array.get board row) col
 let getcount (game : box array array) x y = game.(x).(y).count
 let getflag (game : box array array) x y = game.(x).(y).flag
