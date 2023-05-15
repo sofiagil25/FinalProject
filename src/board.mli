@@ -29,5 +29,5 @@ val isboardsequalquestionmarksimple : box array array -> box array array -> bool
 val placeobs : box array array -> unit
 val placesol : box array array -> unit
 val printboard : box array array -> unit
-val issolution : board -> int -> int -> bool
-val isobstacle : board -> int -> int -> bool
+(* val issolution : board -> int -> int -> bool val isobstacle : board -> int ->
+   int -> bool *)
