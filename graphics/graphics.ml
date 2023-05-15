@@ -112,7 +112,7 @@ let rec drawGrid m =
             (x_coordinate boxWidth i + (boxWidth / 2))
             (y_coordinate boxWidth j + (boxWidth / 2))
             20 Color.black)
-      else
+      else if Board.getflag m i j = true then
         draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
           boxWidth boxWidth Color.yellow
     done
@@ -191,6 +191,36 @@ let buttony =
     (float_of_int ((Array.length !thisgameboard * boxWidth / 3) - 70))
     (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
     200. 100.
+
+let flag_button =
+  Rectangle.create
+    (float_of_int ((Array.length !thisgameboard * boxWidth / 2) + 240))
+    (float_of_int
+       ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) - 50))
+    100. 50.
+
+let draw_flag_button () =
+  draw_rectangle
+    ((Array.length !thisgameboard * boxWidth / 2) + 240)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) - 50)
+    100 50 Color.yellow;
+  draw_text "FLAG"
+    ((Array.length !thisgameboard * boxWidth / 2) + 250)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) - 40)
+    30 Color.red
+
+let eval_flagstate m =
+  draw_flag_button ();
+  if is_mouse_button_pressed MouseButton.Left then
+    if check_collision_point_rec (get_mouse_position ()) flag_button then
+      if !flagstate = false then (
+        flagstate := true;
+        for i = 0 to Array.length m - 1 do
+          for j = 0 to Array.length (Array.get m i) - 1 do
+            Board.setflag m i j
+          done
+        done)
+      else if !flagstate = true then flagstate := false
 
 let draw_easy_button () =
   draw_rectangle
@@ -737,6 +767,7 @@ let rec loop () info_packet =
       if is_mouse_button_pressed MouseButton.Left then eval_exit ();
     if !started = true && !ifwin = false && time_left >= 0 then (
       draw_stats ();
+      eval_flagstate (Board.boardwithvalue !thisgameboard);
       draw_time
         ((elapsed_time |> int_of_float)
         + max (int_of_float !currtotaltime - int_of_float elapsed_time) 0)
