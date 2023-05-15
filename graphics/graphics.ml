@@ -2,19 +2,21 @@ open Raylib
 open Game
 
 let boxWidth : int = 80
+let screenwidth = 900
 
 let setup () =
-  init_window 900 900 "Minesweeper";
+  init_window screenwidth screenwidth "Minesweeper";
   set_target_fps 60;
   set_mouse_scale 1. 1.
 
 let currx = ref 5
 let curry = ref 5
 let currprob = ref 25
+let currtotaltime = ref 0.
 let currstarttime = ref 0.
 let thisgameboard = ref (Board.newboard !currx !curry !currprob)
 let started = ref false
-let top_bar_size = 250
+let top_bar_size = (screenwidth / 2) - (boxWidth / 2 * !currx)
 
 let rec buildRects m =
   let rects =
@@ -144,25 +146,80 @@ let buttony =
     (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
     200. 100.
 
-let draw_start_button () =
+let draw_easy_button () =
   draw_rectangle
-    ((Array.length !thisgameboard * boxWidth / 3) - 70)
-    (Array.length (Array.get !thisgameboard 0) * boxWidth / 2)
-    200 100 Color.black;
-  draw_text "Start"
-    ((Array.length !thisgameboard * boxWidth / 3) - 60)
-    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 10)
+    ((screenwidth / 2) - 300)
+    (screenwidth / 10) 200 100 Color.black;
+  draw_text "Easy"
+    ((screenwidth / 2) - 240)
+    ((screenwidth / 10) + 20)
     30 Color.red;
-  draw_text "Game"
-    ((Array.length !thisgameboard * boxWidth / 3) - 60)
-    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 50)
+  draw_text "Start"
+    ((screenwidth / 2) - 240)
+    ((screenwidth / 10) + 50)
     30 Color.red
 
-let start_button =
+let draw_medium_button () =
+  draw_rectangle (screenwidth / 2) (screenwidth / 10) 200 100 Color.black;
+  draw_text "Medium"
+    ((screenwidth / 2) + 50)
+    ((screenwidth / 10) + 20)
+    30 Color.red;
+  draw_text "Start"
+    ((screenwidth / 2) + 50)
+    ((screenwidth / 10) + 50)
+    30 Color.red
+
+let draw_hard_button () =
+  draw_rectangle
+    ((screenwidth / 2) + 300)
+    (screenwidth / 10) 200 100 Color.black;
+  draw_text "Hard"
+    ((screenwidth / 2) + 360)
+    ((screenwidth / 10) + 20)
+    30 Color.red;
+  draw_text "Start"
+    ((screenwidth / 2) + 360)
+    ((screenwidth / 10) + 50)
+    30 Color.red
+
+let easy_button =
   Rectangle.create
-    (float_of_int ((Array.length !thisgameboard * boxWidth / 3) - 70))
-    (float_of_int (Array.length (Array.get !thisgameboard 0) * boxWidth / 2))
+    (float_of_int ((screenwidth / 2) - 300))
+    (float_of_int (screenwidth / 10))
     200. 100.
+
+let medium_button =
+  Rectangle.create
+    (float_of_int (screenwidth / 2))
+    (float_of_int (screenwidth / 10))
+    200. 100.
+
+let hard_button =
+  Rectangle.create
+    (float_of_int ((screenwidth / 2) + 300))
+    (float_of_int (screenwidth / 10))
+    200. 100.
+
+let easystate = ref false
+let mediumstate = ref false
+let hardstate = ref false
+
+let game_start () =
+  started := true;
+  currstarttime := Raylib.get_time ();
+  currtotaltime := 30.
+
+let eval_state () =
+  if check_collision_point_rec (get_mouse_position ()) easy_button then (
+    easystate := true;
+    game_start ())
+  else if check_collision_point_rec (get_mouse_position ()) medium_button then (
+    mediumstate := true;
+    game_start ())
+  else if check_collision_point_rec (get_mouse_position ()) hard_button then (
+    hardstate := true;
+    game_start ())
 
 let buttonn =
   Rectangle.create
@@ -243,10 +300,6 @@ let draw_stats () =
        (Array.length !thisgameboard * Array.length (Array.get !thisgameboard 0)))
     550 450 50 Color.black
 
-let game_start () =
-  started := true;
-  currstarttime := Raylib.get_time ()
-
 let restart_game () =
   clear_background Color.white;
   thisgameboard := Board.newboard !currx !curry 15;
@@ -255,6 +308,7 @@ let restart_game () =
   started := true;
   alive := true;
   currstarttime := Raylib.get_time ();
+  currtotaltime := 30.;
   drawGrid (Board.boardwithvalue !thisgameboard)
 
 let quit_game () =
@@ -269,28 +323,45 @@ let draw_win () =
 let ifwin = ref false
 
 let draw_instructions () =
-  clear_background Color.orange;
+  clear_background Color.green;
   draw_text "Instructions: the thing does the thing" 50 50 30 Color.black;
   draw_text "Press any box to start playing" 350 650 30 Color.black
+
+let draw_beginning_screen () =
+  draw_instructions ();
+  draw_easy_button ();
+  draw_medium_button ();
+  draw_hard_button ()
+
+let draw_time orig_seconds remaining_seconds =
+  match remaining_seconds with
+  | 10 -> draw_text "HALF TIME LEFT" 650 450 50 Color.red
+  | 5 -> draw_text "FIVE SECONDS" 650 450 50 Color.red
+  | 4 -> draw_text "HURRY UP" 650 450 50 Color.red
+  | 3 -> draw_text "THREE SECS LEFT" 650 450 50 Color.red
+  | 2 -> draw_text "TWOOOOOOO" 650 450 50 Color.red
+  | 1 -> draw_text "ONEEEEEEE" 650 450 50 Color.red
+  | _ -> draw_text (string_of_int remaining_seconds) 650 450 50 Color.red
 
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let open Raylib in
     let elapsed_time = Raylib.get_time () -. !currstarttime in
-    let remaining_seconds = max (!currprob - int_of_float elapsed_time) 0 in
+    let remaining_seconds =
+      max (int_of_float !currtotaltime - int_of_float elapsed_time) 0
+    in
     begin_drawing ();
-    if is_mouse_button_pressed MouseButton.Left then
-      if check_collision_point_rec (get_mouse_position ()) start_button then
-        game_start ();
+    if is_mouse_button_pressed MouseButton.Left then eval_state ();
     if !started = true && !ifwin = false then (
       draw_stats ();
-      Raylib.draw_text (string_of_int remaining_seconds) 650 450 50 Color.red;
+      draw_time
+        ((elapsed_time |> int_of_float) + remaining_seconds)
+        remaining_seconds;
       if not !alive then (
         clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
         draw_lose ();
-
         if is_mouse_button_pressed MouseButton.Left then
           if check_collision_point_rec (get_mouse_position ()) buttony then
             restart_game ()
@@ -306,8 +377,7 @@ let rec loop () =
           let mouse_pos = get_mouse_position in
           findCollision (mouse_pos ())))
     else if !ifwin = false then (
-      draw_instructions ();
-      draw_start_button ();
+      draw_beginning_screen ();
       clear_background Color.white)
     else draw_win ();
 
