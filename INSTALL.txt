@@ -1,5 +1,7 @@
 for mac, run the following 
 
+Install OCaml: https://cs3110.github.io/textbook/chapters/preface/install.html
+
 opam install raylib
 opam install raygui
 

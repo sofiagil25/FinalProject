@@ -2,7 +2,7 @@ open Raylib
 open Game
 
 let boxWidth : int = 80
-let screenwidth = 900
+let screenwidth = 1500
 
 type info_packet = { textures : Texture2D.t list }
 
@@ -71,8 +71,8 @@ let setup () =
       ];
   }
 
-let currx = ref 8
-let curry = ref 8
+let currx = ref 6
+let curry = ref 6
 let flagstate = ref false
 
 let edit_game = ref false
@@ -377,20 +377,20 @@ let game_start () =
 
 let easy_mode () =
   currtotaltime := 150.;
-  currprob := 25;
+  currprob := 10;
   thisgameboard := Board.newboard !currx !curry !currprob;
   game_start ()
 
 let medium_mode () =
   currtotaltime := 150.;
-  currprob := 35;
+  currprob := 25;
   thisgameboard := Board.newboard !currx !curry !currprob;
   currtotaltime := 60.;
   game_start ()
 
 let hard_mode () =
   currtotaltime := 150.;
-  currprob := 45;
+  currprob := 35;
   thisgameboard := Board.newboard !currx !curry !currprob;
   (* this is what breaks the cide *)
   currtotaltime := 40.;
@@ -443,7 +443,7 @@ let buttonn =
 let draw_lose textures =
   draw_text "you are a loser :c"
     ((Array.length !thisgameboard * boxWidth / 3) - 50)
-    (Array.length (Array.get !thisgameboard 0) * boxWidth / 3)
+    (Array.length (Array.get !thisgameboard 0) * boxWidth / 3- 100)
     50 Color.orange;
   draw_rectangle
     ((Array.length !thisgameboard * boxWidth / 3) - 70)
@@ -455,7 +455,7 @@ let draw_lose textures =
     200 100 Color.white;
   draw_text "try again?"
     ((Array.length !thisgameboard * boxWidth / 3) + 60)
-    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 3) + 70)
+    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 3) - 40)
     40 Color.orange;
   draw_text "ye"
     (Array.length !thisgameboard * boxWidth / 3)

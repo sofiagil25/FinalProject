@@ -33,7 +33,6 @@ zip:
 clean:
 	dune clean
 	rm -f blackjack.zip
-
 doc:
 	dune build @doc
 

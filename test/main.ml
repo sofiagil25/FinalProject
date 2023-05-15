@@ -12,6 +12,9 @@ open Game
    for the both. This is simple equality. The second standand was full equality.
    Full equality implies that the count, flag, bomb value, obstacle status, and
    solution status are all equal for equivalent elements of boards a and b. *)
+  (*
+  description
+     *)
 let thisgameboard = ref (Board.newboard 6 5 15)
 let thisboard = Array.make 5 (Board.tobox 0 0 0)
 
