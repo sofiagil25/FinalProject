@@ -234,6 +234,28 @@ let countuncovered () : int =
   done;
   !x
 
+let draw_stats () =
+  draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
+  draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
+  draw_text
+    (string_of_int
+       (Array.length !thisgameboard * Array.length (Array.get !thisgameboard 0)))
+    550 450 50 Color.black
+
+let restart_game () =
+  clear_background Color.white;
+  thisgameboard := Board.newboard !currx !curry 15;
+  flagstate := false;
+  resetBoard 0 0;
+  started := true;
+  alive := true;
+  drawGrid (Board.boardwithvalue !thisgameboard)
+
+let quit_game () =
+  end_drawing ();
+  started := true;
+  close := true
+
 let draw_instructions () =
   clear_background Color.orange;
   draw_text "Instructions: the thing does the thing" 50 50 30 Color.black;
@@ -249,40 +271,19 @@ let rec loop () =
       if check_collision_point_rec (get_mouse_position ()) start_button then
         started := true;
     if !started = true then (
-      draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
-      draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
-      draw_text
-        (string_of_int
-           (Array.length !thisgameboard
-           * Array.length (Array.get !thisgameboard 0)))
-        550 450 50 Color.black;
+      draw_stats ();
       if not !alive then (
         clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
         draw_lose ();
         if is_mouse_button_pressed MouseButton.Left then
-          if check_collision_point_rec (get_mouse_position ()) buttony then (
-            clear_background Color.white;
-            thisgameboard := Board.newboard !currx !curry 15;
-            flagstate := false;
-            resetBoard 0 0;
-            started := true;
-            alive := true;
-            drawGrid (Board.boardwithvalue !thisgameboard))
-          else if check_collision_point_rec (get_mouse_position ()) buttonn then (
-            end_drawing ();
-            started := true;
-            close := true))
+          if check_collision_point_rec (get_mouse_position ()) buttony then
+            restart_game ()
+          else if check_collision_point_rec (get_mouse_position ()) buttonn then
+            quit_game ())
       else if is_cursor_on_screen () then (
-        if
-          Array.length !thisgameboard
-          * Array.length (Array.get !thisgameboard 0)
-          - countuncovered ()
-          = countbombs ()
-        then (
-          clear_background Color.raywhite;
-          drawGrid (Board.boardwithvalue !thisgameboard);
-          draw_text "yipeeee" 350 450 50 Color.black)
+        if (!currx * !curry) - countuncovered () = countbombs () then
+          draw_text "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" 50 50 100 Color.black
         else clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
         if is_mouse_button_pressed MouseButton.Left then
