@@ -258,6 +258,17 @@ let rec line_to_string line (row : int) (name : string) (funct : box -> string)
   done;
   !str ^ "]"
 
+let string_of_box_full box =
+  "{ row = " ^ string_of_int box.row ^ "; col = " ^ string_of_int box.col
+  ^ "; bomb = "
+  ^ string_of_bool (-1 = box.bomb)
+  ^ "; count = " ^ string_of_int box.count ^ "; flag = "
+  ^ string_of_bool !(box.flag) ^ "; obstacle = "
+  ^ string_of_bool !(box.obstacle)
+  ^ "; solution = "
+  ^ string_of_bool !(box.obstacle)
+  ^ "}"
+
 let to_string_count (board : box array array) =
   let str = ref "[" in
   for i = 0 to Array.length board - 1 do

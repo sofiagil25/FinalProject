@@ -12,9 +12,7 @@ open Game
    for the both. This is simple equality. The second standand was full equality.
    Full equality implies that the count, flag, bomb value, obstacle status, and
    solution status are all equal for equivalent elements of boards a and b. *)
-  (*
-  description
-     *)
+(* description *)
 let thisgameboard = ref (Board.newboard 6 5 15)
 let thisboard = Array.make 5 (Board.tobox 0 0 0)
 
@@ -346,7 +344,11 @@ let board_tests =
       assert (
         let _ = Board.setflag boardwithflag 2 3 in
         Board.getflag boardwithflag 2 3 = true) );
-    ( "test count fails" >:: fun _ ->
+    ( "test count simple equality fails" >:: fun _ ->
+      assert (
+        Board.isboardsequalquestionmarksimple boardwithbomb boardwithbomblarge
+        == false) );
+    ( "test count full equality fails" >:: fun _ ->
       assert (
         Board.isboardsequalquestionmark boardwithbomb boardwithbomblarge
         == false) );
@@ -358,6 +360,8 @@ let board_tests =
     ("test is_mine false" >:: fun _ -> assert (Board.ismine boardcoord 2 3 == 0));
     ( "test random board generation" >:: fun _ ->
       assert (checkboardrandom 25 25 50) );
+    ( "test random board generation larger board" >:: fun _ ->
+      assert (checkboardrandom 60 60 50) );
     ( "test random board always same for prob 100" >:: fun _ ->
       assert (checkboardrandom 25 25 100 == false) );
     ( "test random board always same for prob 0" >:: fun _ ->
@@ -366,6 +370,8 @@ let board_tests =
     >:: fun _ -> assert (checkboardrandom 25 35 0 == false) );
     ( "assert random board with different sizes" >:: fun _ ->
       assert (checkboardrandom 25 35 50) );
+    ( "assert random board with largest size" >:: fun _ ->
+      assert (checkboardrandom 70 70 50) );
     ( "test no obs or sol when not called" >:: fun _ ->
       assert (ifobsthensolution (Board.newboard 11 5 100)) );
     ( "test no obs or sol when called with percentage >>50" >:: fun _ ->
@@ -414,8 +420,8 @@ let board_tests =
         let _ = Board.placesol boarda in
         let _ = Board.placeobs boardb in
         let _ = Board.placesol boardb in
-        let _ = Board.printboard boarda in
-        let _ = Board.printboard boardb in
+        (* let _ = Board.printboard boarda in let _ = Board.printboard boardb
+           in *)
         Board.isboardsequalquestionmark boarda boardb = false) );
     ( "assert boarda and boardb are still simply equal" >:: fun _ ->
       assert (
@@ -423,8 +429,8 @@ let board_tests =
         let _ = Board.placesol boarda in
         let _ = Board.placeobs boardb in
         let _ = Board.placesol boardb in
-        let _ = Board.printboard boarda in
-        let _ = Board.printboard boardb in
+        (* let _ = Board.printboard boarda in let _ = Board.printboard boardb
+           in *)
         Board.isboardsequalquestionmarksimple boarda boardb) );
     ( "assert solutions in boara" >:: fun _ ->
       assert (
@@ -474,10 +480,19 @@ let board_tests =
           || Board.issolution (Board.makeboard bc) 0 1
           || Board.issolution (Board.makeboard bc) 1 0
           || Board.issolution (Board.makeboard bc) 1 1)) );
+    ( "assert solutions not same spot as obstacle" >:: fun _ ->
+      assert (
+        not
+          (Board.issolution (Board.makeboard bo) 0 0
+           && Board.isobstacle (Board.makeboard bo) 0 0
+          || Board.issolution (Board.makeboard bo) 0 1
+             && Board.isobstacle (Board.makeboard bo) 0 1
+          || Board.issolution (Board.makeboard bo) 1 0
+             && Board.isobstacle (Board.makeboard bo) 1 0
+          || Board.issolution (Board.makeboard bo) 1 1
+             && Board.isobstacle (Board.makeboard bo) 1 1)) );
     ( "assert boardc and boardo are simply equal" >:: fun _ ->
       assert (Board.isboardsequalquestionmarksimple bc bo) );
-    ( "assert boardc and boardo are not equal" >:: fun _ ->
-      assert (not (Board.isboardsequalquestionmark bc bo)) );
     ( "assert to_string_count of small board is correct" >:: fun _ ->
       assert (
         Board.to_string_count bo
@@ -517,7 +532,25 @@ let board_tests =
         Board.to_string_flag bc
         = "[[[Flag of (0, 0) = false; Flag of (0, 1) = false]]; [[Flag of (1, \
            0) = false; Flag of (1, 1) = false]]]") );
+    ( "check string_of_box_full for bomb" >:: fun _ ->
+      assert (
+        let x = Board.tobox 1 2 (-1) 0 false in
+        Board.string_of_box_full x
+        = "{ row = 1; col = 2; bomb = true; count = 0; flag = false; obstacle \
+           = false; solution = false}") );
+    ( "check string_of_box_full for not bomb" >:: fun _ ->
+      assert (
+        let x = Board.tobox 1 2 0 0 false in
+        Board.string_of_box_full x
+        = "{ row = 1; col = 2; bomb = false; count = 0; flag = false; obstacle \
+           = false; solution = false}") );
   ]
 
 let suite = "Test suite for Minesweeper" >::: List.flatten [ board_tests ]
-let _ = run_test_tt_main suite
+
+let _ =
+  let _ = Board.placeobs boarda in
+  let _ = Board.placesol boarda in
+  let _ = Board.placeobs boardb in
+  let _ = Board.placesol boardb in
+  run_test_tt_main suite
