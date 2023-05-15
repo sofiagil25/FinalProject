@@ -1,14 +1,17 @@
 open OUnit2
 open Game
 
-(* The test plan should be located in a comment at the top of the test file.
-
-   -4: The test plan is missing. -1: The test plan does not explain which parts
-   of the system were automatically tested by OUnit vs. manually tested. -1: The
-   test plan does not explain what modules were tested by OUnit and how test
-   cases were developed (black box, glass box, randomized, etc.). -1: The test
-   plan does not provide an argument for why the testing approach demonstrates
-   the correctness of the system. *)
+(* The test plan should be located in a comment at the top of the test file. All
+   elements of board were tested usign OUnit, while graphics was necessarily
+   tested through gameplay. Test cases were developed using glass box testing.
+   The tests build on each element of board, starting with estabilishing two
+   different standands for board equality : simple equality and full equality.
+   Simple equality implies that the boards are the same size and the count
+   values are correct -> that is, for every element in board a, if board b is
+   equal, the count of how many bombs the element is touching should be the same
+   for the both. This is simple equality. The second standand was full equality.
+   Full equality implies that the count, flag, bomb value, obstacle status, and
+   solution status are all equal for equivalent elements of boards a and b. *)
 let thisgameboard = ref (Board.newboard 6 5 15)
 let thisboard = Array.make 5 (Board.tobox 0 0 0)
 
