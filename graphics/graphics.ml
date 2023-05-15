@@ -23,7 +23,7 @@ let setup () =
   (*used*)
   image_resize (addr coin) 200 200;
   image_resize (addr heart) 200 200;
-  image_resize (addr bomb) 200 200;
+  image_resize (addr bomb) 100 100;
   image_resize (addr micheal_clarkson_mad) 200 200;
   (*used*)
   image_resize (addr dexter_kozen) 200 200;
@@ -59,6 +59,8 @@ let setup () =
 
 let currx = ref 4
 let curry = ref 4
+let flagstate = ref false
+
 let edit_game = ref false
 let start_mode = ref true
 let currprob = ref 25
@@ -91,19 +93,25 @@ let rects = buildRects !thisgameboard
 let y_coordinate orig_width j = top_bar_size + (j * orig_width)
 let x_coordinate orig_width x = top_bar_size + (x * orig_width)
 
-let rec drawGrid m =
+let rec drawGrid m textures=
   for i = 0 to Array.length m - 1 do
     for j = 0 to Array.length (Array.get m i) - 1 do
-      if Board.getflag m i j = false then
+      if Board.getflag m i j = false then(
         if
           match rects.(i).(j) with
           | _, bool -> not bool
         then
           draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
             boxWidth boxWidth Color.black
-        else if Board.ismine m i j = -1 then
+        else if( Board.ismine m i j = -1 && 
+          Board.getflag m i j = false&& !flagstate=false) then
           draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
             boxWidth boxWidth Color.red
+        else if (!flagstate=true) then
+        (
+            draw_texture (List.nth textures 3) (x_coordinate boxWidth i)
+            (y_coordinate boxWidth j) Color.raywhite
+        )
         else (
           draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
             boxWidth boxWidth Color.gray;
@@ -111,10 +119,15 @@ let rec drawGrid m =
             (string_of_int (Board.getcount m i j))
             (x_coordinate boxWidth i + (boxWidth / 2))
             (y_coordinate boxWidth j + (boxWidth / 2))
-            20 Color.black)
-      else if Board.getflag m i j = true then
+            20 Color.black))
+      else if Board.getflag m i j = true then(
+        (print_string "GET GET GET GET flag = true";
         draw_rectangle (x_coordinate boxWidth i) (y_coordinate boxWidth j)
-          boxWidth boxWidth Color.yellow
+          boxWidth boxWidth Color.yellow;
+        draw_texture (List.nth textures 3) (x_coordinate boxWidth i)
+         (y_coordinate boxWidth j) Color.raywhite))
+
+        
     done
   done
 
@@ -162,7 +175,6 @@ let rec expandZeroTiles i j : unit =
       expandZeroTiles i (j + 1)
   end
 
-let flagstate = ref false
 
 let findCollision mouse_pos =
   let rows = Array.length rects in
@@ -488,7 +500,7 @@ let draw_stats () =
        (Array.length !thisgameboard * Array.length (Array.get !thisgameboard 0)))
     550 450 50 Color.black
 
-let restart_game () =
+let restart_game textures =
   clear_background Color.white;
   (* thisgameboard := Board.newboard !currx !curry !currprob; *)
   flagstate := false;
@@ -508,7 +520,7 @@ let restart_game () =
     currtotaltime := 31.;
     currprob := 40;
     thisgameboard := Board.newboard !currx !curry !currprob);
-  drawGrid (Board.boardwithvalue !thisgameboard)
+  drawGrid (Board.boardwithvalue !thisgameboard) textures
 
 let quit_game () =
   end_drawing ();
@@ -678,7 +690,7 @@ let draw_info () : unit =
     100 650 25 Color.black
 
 let lose textures =
-  drawGrid (Board.boardwithvalue !thisgameboard);
+  drawGrid (Board.boardwithvalue !thisgameboard) textures;
   clear_background Color.raywhite;
   draw_lose textures
 
@@ -756,6 +768,7 @@ let draw_time orig_seconds remaining_seconds =
           (xcoord + 70) ycoord 50 Color.red)
 
 let rec loop () info_packet =
+  let textures=info_packet.textures in
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let elapsed_time = Raylib.get_time () -. !currstarttime in
@@ -773,10 +786,10 @@ let rec loop () info_packet =
         + max (int_of_float !currtotaltime - int_of_float elapsed_time) 0)
         (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
       if not !alive then (
-        lose info_packet.textures;
+        lose textures;
         if is_mouse_button_pressed MouseButton.Left then
           if check_collision_point_rec (get_mouse_position ()) buttony then
-            restart_game ()
+            restart_game textures
           else if check_collision_point_rec (get_mouse_position ()) buttonn then
             quit_game ())
       else if is_cursor_on_screen () then (
@@ -784,7 +797,7 @@ let rec loop () info_packet =
           ifwin := true;
           draw_text "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" 50 50 100 Color.black)
         else clear_background Color.raywhite;
-        drawGrid (Board.boardwithvalue !thisgameboard);
+        drawGrid (Board.boardwithvalue !thisgameboard)textures;
         if is_mouse_button_pressed MouseButton.Left then
           let mouse_pos = get_mouse_position in
           findCollision (mouse_pos ())))
@@ -800,18 +813,18 @@ let rec loop () info_packet =
       draw_team ();
       if is_mouse_button_pressed MouseButton.Left then eval_exit ())
     else if time_left < 0 then (
-      lose info_packet.textures;
+      lose textures;
       if is_mouse_button_pressed MouseButton.Left then
         if check_collision_point_rec (get_mouse_position ()) buttony then
-          restart_game ()
+          restart_game textures
         else if check_collision_point_rec (get_mouse_position ()) buttonn then
           quit_game ())
     else if time_left >= 0 then (
-      draw_win info_packet.textures;
+      draw_win textures;
       if is_mouse_button_pressed MouseButton.Left then
         if check_collision_point_rec (get_mouse_position ()) buttonywin then (
           ifwin := false;
-          restart_game ())
+          restart_game textures)
         else if check_collision_point_rec (get_mouse_position ()) buttonnwin
         then (
           ifwin := false;
