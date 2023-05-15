@@ -61,20 +61,20 @@ let toporbottom x =
      Array.append (babyarraybomb x 2 5 false) |> Array.append (babyarraybomb x 3
      5 false) |> Array.append (babyarraybomb x 4 3 false) *)
   babyarraybomb x 4 3 false
-  |> Array.append (babyarraybomb x 3 5 false)
-  |> Array.append (babyarraybomb x 2 5 false)
-  |> Array.append (babyarraybomb x 1 5 false)
-  |> Array.append (babyarraybomb x 0 3 false)
+  |> Array.append (Array.copy (babyarraybomb x 3 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 2 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 1 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 0 3 false))
 
 let middle x =
   (* babyarraybomb x 0 5 false |> Array.append (babyarraybomb x 1 8 false) |>
      Array.append (babyarraybomb x 2 8 false) |> Array.append (babyarraybomb x 3
      8 false) |> Array.append (babyarraybomb x 4 5 false) *)
   babyarraybomb x 4 5 false
-  |> Array.append (babyarraybomb x 3 8 false)
-  |> Array.append (babyarraybomb x 2 8 false)
-  |> Array.append (babyarraybomb x 1 8 false)
-  |> Array.append (babyarraybomb x 0 5 false)
+  |> Array.append (Array.copy (babyarraybomb x 3 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 2 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 1 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 0 5 false))
 
 let bline0 = toporbottom 0
 let bline1 = middle 1
@@ -87,37 +87,37 @@ let boardwithbomb =
      (Array.make 1 bline2) |> Array.append (Array.make 1 bline3) |> Array.append
      (Array.make 1 bline4) *)
   Array.make 1 bline4
-  |> Array.append (Array.make 1 bline3)
-  |> Array.append (Array.make 1 bline2)
-  |> Array.append (Array.make 1 bline1)
-  |> Array.append (Array.make 1 bline0)
+  |> Array.append (Array.copy (Array.make 1 bline3))
+  |> Array.append (Array.copy (Array.make 1 bline2))
+  |> Array.append (Array.copy (Array.make 1 bline1))
+  |> Array.append (Array.copy (Array.make 1 bline0))
 
 (* testing count on a regatangular board *)
 let toporbottomlarge x =
-  babyarraybomb x 10 3 false
-  |> Array.append (babyarraybomb x 9 5 false)
-  |> Array.append (babyarraybomb x 8 5 false)
-  |> Array.append (babyarraybomb x 7 5 false)
-  |> Array.append (babyarraybomb x 6 5 false)
-  |> Array.append (babyarraybomb x 5 5 false)
-  |> Array.append (babyarraybomb x 4 5 false)
-  |> Array.append (babyarraybomb x 3 5 false)
-  |> Array.append (babyarraybomb x 2 5 false)
-  |> Array.append (babyarraybomb x 1 5 false)
-  |> Array.append (babyarraybomb x 0 3 false)
+  Array.copy (babyarraybomb x 10 3 false)
+  |> Array.append (Array.copy (babyarraybomb x 9 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 8 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 7 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 6 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 5 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 4 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 3 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 2 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 1 5 false))
+  |> Array.append (Array.copy (babyarraybomb x 0 3 false))
 
 let middlelarge x =
-  babyarraybomb x 10 5 false
-  |> Array.append (babyarraybomb x 9 8 false)
-  |> Array.append (babyarraybomb x 8 8 false)
-  |> Array.append (babyarraybomb x 7 8 false)
-  |> Array.append (babyarraybomb x 6 8 false)
-  |> Array.append (babyarraybomb x 5 8 false)
-  |> Array.append (babyarraybomb x 4 8 false)
-  |> Array.append (babyarraybomb x 3 8 false)
-  |> Array.append (babyarraybomb x 2 8 false)
-  |> Array.append (babyarraybomb x 1 8 false)
-  |> Array.append (babyarraybomb x 0 5 false)
+  Array.copy (babyarraybomb x 10 5 false)
+  |> Array.append (Array.copy (babyarraybomb x 9 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 8 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 7 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 6 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 5 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 4 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 3 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 2 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 1 8 false))
+  |> Array.append (Array.copy (babyarraybomb x 0 5 false))
 
 let blinelarge0 = toporbottomlarge 0
 let blinelarge1 = middlelarge 1
@@ -132,7 +132,18 @@ let boardwithbomblarge =
   |> Array.append (Array.make 1 blinelarge1)
   |> Array.append (Array.make 1 blinelarge0)
 
-let boardwithflag = boardwithbomblarge
+let copy0 : Board.box array = Array.copy blinelarge0
+let copy1 = Array.copy blinelarge1
+let copy2 = Array.copy blinelarge2
+let copy3 = Array.copy blinelarge3
+let copy4 = Array.copy blinelarge4
+
+let boardwithflag =
+  Array.make 1 copy4
+  |> Array.append (Array.make 1 copy3)
+  |> Array.append (Array.make 1 copy2)
+  |> Array.append (Array.make 1 copy1)
+  |> Array.append (Array.make 1 copy0)
 
 (* Set position x y as flagged *)
 let flag x y board = Board.setflag board x y
@@ -194,9 +205,8 @@ let ifobsthensolution board =
   let one = obsinboard board in
   let two = solinboard board in
   one == two
-
-let brd1 = boardcoord
-let brd2 = boardcoord
+(* let brd1 = Array.copy boardwithbomblarge let brd2 = Array.copy
+   boardwithbomblarge *)
 
 let board_tests =
   [
@@ -230,79 +240,107 @@ let board_tests =
       assert (
         Board.isboardsequalquestionmark boardwithbomblarge
           (Board.newboard 11 5 100)) );
-    ( "test count fails" >:: fun _ ->
-      assert (
-        flag 2 3 boardwithflag;
-        Board.isboardsequalquestionmark boardwithbomb boardwithbomblarge
-        == false) );
     ( "test get_flag no flag" >:: fun _ ->
-      assert (Board.getflag boardwithflag 2 4 == false) );
+      assert (Board.getflag boardwithflag 2 4 = false) );
     ( "test set_flag" >:: fun _ ->
       assert (
-        flag 2 3 boardwithflag;
-        Board.getflag boardwithflag 2 3 == true) );
+        let _ = Board.setflag boardwithflag 2 3 in
+        Board.getflag boardwithflag 2 3 = true) );
+    ( "test count fails" >:: fun _ ->
+      assert (
+        Board.isboardsequalquestionmark boardwithbomb boardwithbomblarge
+        == false) );
+    (* ( "test set_flag fail" >:: fun _ -> let brd3 = Array.copy
+       boardwithbomblarge in let _ = Board.setflag brd3 2 3 in assert
+       (Board.getflag brd3 2 3 = false) ); *)
     ( "test is_mine true" >:: fun _ ->
       assert (Board.ismine boardwithflag 2 3 == -1) );
     ("test is_mine false" >:: fun _ -> assert (Board.ismine boardcoord 2 3 == 0));
     ( "test random board generation" >:: fun _ ->
-      assert (checkboardrandom 25 25 30) );
+      assert (checkboardrandom 25 25 50) );
     ( "test random board always same for prob 100" >:: fun _ ->
       assert (checkboardrandom 25 25 100 == false) );
     ( "test random board always same for prob 0" >:: fun _ ->
       assert (checkboardrandom 25 25 0 == false) );
     ( "test no obs or sol when not called" >:: fun _ ->
       assert (ifobsthensolution (Board.newboard 11 5 100)) );
-    ( "test no obs or sol when called with percentage >50" >:: fun _ ->
+    ( "test no obs or sol when called with percentage >>50" >:: fun _ ->
       assert (
-        let brd = Board.newboard 11 10 85 in
+        let brd = Board.newboard 11 10 90 in
         Board.placeobs brd;
         Board.placesol brd;
         ifobsthensolution brd) );
-    ( "test no obs only when called with percentage >50" >:: fun _ ->
+    ( "test no obs only when called with percentage >>50" >:: fun _ ->
       assert (
         let brd = Board.newboard 11 10 90 in
         Board.placeobs brd;
         Board.placesol brd;
         obsinboard brd == false) );
-    ( "test no sol only when called with percentage >50" >:: fun _ ->
+    ( "test no sol only when called with percentage >>50" >:: fun _ ->
       assert (
-        let brd = Board.newboard 11 10 60 in
+        let brd = Board.newboard 11 10 90 in
         Board.placeobs brd;
         Board.placesol brd;
         solinboard brd == false) );
-    ( "test yes obs and sol when called with percentage <50" >:: fun _ ->
+    ( "test yes obs and sol when called with percentage <<50" >:: fun _ ->
       assert (
-        let brd = Board.newboard 11 10 20 in
+        let brd = Board.newboard 11 10 10 in
         Board.placeobs brd;
         Board.placesol brd;
         ifobsthensolution brd) );
-    ( "test yes obs only when called with percentage <50" >:: fun _ ->
+    ( "test yes obs only when called with percentage <<50" >:: fun _ ->
       assert (
-        let brd = Board.newboard 11 10 40 in
+        let brd = Board.newboard 11 10 19 in
         Board.placeobs brd;
         Board.placesol brd;
         obsinboard brd) );
-    ( "test yes sol only when called with percentage <50" >:: fun _ ->
+    ( "test yes sol only when called with percentage <<50" >:: fun _ ->
       assert (
-        let brd = Board.newboard 11 10 30 in
+        let brd = Board.newboard 11 10 19 in
         Board.placeobs brd;
         Board.placesol brd;
         solinboard brd) );
-    ( "assert creating obstacles with the same object twice will not result in \
-       the same obstacle location"
+    ( "assert creating obstacles with the same object twice will still result\n\
+      \        in the same simple grid"
     >:: fun _ ->
       assert (
-        let _ = print_string "made it here! " in
-        Board.placeobs brd1;
-        Board.placesol brd1;
-        Board.placeobs brd2;
-        Board.placesol brd2;
-        Board.isboardsequalquestionmark brd1 brd2 == false) )
-    (* ( "assert creating obstacles with the same object twice will still result
-       \ in the same simple grid" >:: fun _ -> assert ( let brd1 = boardcoord in
-       Board.placeobs brd1; Board.placesol brd1; let brd2 = boardcoord in
-       Board.placeobs brd2; Board.placesol brd2;
-       Board.isboardsequalquestionmarksimple brd1 brd2) ); *);
+        let brd1 = Array.copy boardcoord in
+        let _ = Board.placeobs brd1 in
+        let _ = Board.placesol brd1 in
+        let brd2 = Array.copy boardcoord in
+        let _ = Board.placeobs brd2 in
+        let _ = Board.placesol brd2 in
+        Board.isboardsequalquestionmarksimple brd1 brd2) );
+    ( "assert creating obstacles with the same object twice will still result\n\
+      \        in the different full grid"
+    >:: fun _ ->
+      assert (
+        let brd4 = Array.copy boardcoord in
+        let _ = Board.placeobs brd4 in
+        let brd5 = Array.copy boardcoord in
+        let _ = Board.placeobs brd5 in
+        Board.isboardsequalquestionmark brd4 brd5 = false) );
+    ( "assert creating solutions with the same object twice will still result\n\
+      \        in the different full grid"
+    >:: fun _ ->
+      assert (
+        let brd4 = Array.copy boardcoord in
+        let _ = Board.placesol brd4 in
+        let brd5 = Array.copy boardcoord in
+        let _ = Board.placeobs brd5 in
+        Board.isboardsequalquestionmark brd4 brd5 = false) );
+    ( "assert creating obstacles and solutions with the same object twice will \
+       still result\n\
+      \        in the different full grid"
+    >:: fun _ ->
+      assert (
+        let brd4 = Array.copy boardcoord in
+        let _ = Board.placeobs brd4 in
+        let _ = Board.placesol brd4 in
+        let brd5 = Array.copy boardcoord in
+        let _ = Board.placeobs brd5 in
+        let _ = Board.placesol brd5 in
+        Board.isboardsequalquestionmark brd4 brd5 = false) );
   ]
 
 let suite = "Test suite for Minesweeper" >::: List.flatten [ board_tests ]

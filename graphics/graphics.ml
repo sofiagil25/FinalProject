@@ -4,9 +4,7 @@ open Game
 let boxWidth : int = 80
 let screenwidth = 900
 
-type info_packet = {
-  textures : Texture2D.t list;
-}
+type info_packet = { textures : Texture2D.t list }
 
 let setup () =
   init_window screenwidth screenwidth "Minesweeper";
@@ -15,16 +13,18 @@ let setup () =
 
   let micheal_clarkson = load_image "img/clarkson.png" in
   let coin = load_image "img/coin.png" in
-  let heart = load_image "img/heart.png"in
+  let heart = load_image "img/heart.png" in
   let bomb = load_image "img/bomb.png" in
   let micheal_clarkson_mad = load_image "img/clarkson.jpeg" in
   let dexter_kozen = load_image "img/dexter.jpeg" in
 
-  image_resize (addr micheal_clarkson) 200 200; (*used*)
+  image_resize (addr micheal_clarkson) 200 200;
+  (*used*)
   image_resize (addr coin) 200 200;
   image_resize (addr heart) 200 200;
   image_resize (addr bomb) 200 200;
-  image_resize (addr micheal_clarkson_mad) 200 200; (*used*)
+  image_resize (addr micheal_clarkson_mad) 200 200;
+  (*used*)
   image_resize (addr dexter_kozen) 200 200;
 
   let clarkson_texture = load_texture_from_image micheal_clarkson in
@@ -33,7 +33,6 @@ let setup () =
   let bomb_texture = load_texture_from_image bomb in
   let clarkson_mad_texture = load_texture_from_image micheal_clarkson_mad in
   let dexter_texture = load_texture_from_image dexter_kozen in
-
 
   unload_image micheal_clarkson;
   unload_image coin;
@@ -53,19 +52,16 @@ let setup () =
       ];
   }
 
-
 let currx = ref 4
 let curry = ref 4
-let edit_game = ref (false)
-
-let start_mode=ref(true)
+let edit_game = ref false
+let start_mode = ref true
 let currprob = ref 25
 let currtotaltime = ref 0.
 let currstarttime = ref 0.
 let thisgameboard = ref (Board.newboard !currx !curry !currprob)
 let started = ref false
 let top_bar_size = (screenwidth / 2) - (boxWidth / 2 * !currx)
-
 
 let rec buildRects m =
   let rects =
@@ -118,25 +114,16 @@ let rec drawGrid m =
   done
 
 let alive = ref true
-let isZero x y =
-  Board.getcount (Board.boardwithvalue !thisgameboard) x y = 0
-
-
-
-let isBomb x y =
-    Board.ismine (Board.boardwithvalue !thisgameboard) x y = -1
-    
-
+let isZero x y = Board.getcount (Board.boardwithvalue !thisgameboard) x y = 0
+let isBomb x y = Board.ismine (Board.boardwithvalue !thisgameboard) x y = -1
 
 let tileStatus x y =
- match rects.(x).(y) with
-    | _, b -> b
-
+  match rects.(x).(y) with
+  | _, b -> b
 
 let showTile x y =
- match rects.(x).(y) with
-    | rectangle, _ -> rects.(x).(y) <- (rectangle, true)
-
+  match rects.(x).(y) with
+  | rectangle, _ -> rects.(x).(y) <- (rectangle, true)
 
 let rec expandZeroTiles i j : unit =
   if (not (isBomb i j)) && not (isZero i j) then begin
@@ -203,8 +190,7 @@ let buttony =
 let draw_easy_button () =
   draw_rectangle
     ((screenwidth / 2) - 300)
-    (screenwidth / 10) 200 
-    100 Color.black;
+    (screenwidth / 10) 200 100 Color.black;
   draw_text "Easy"
     ((screenwidth / 2) - 240)
     ((screenwidth / 10) + 20)
@@ -265,42 +251,42 @@ let game_start () =
   currstarttime := Raylib.get_time ();
   currtotaltime := 30.
 
-let easy_mode()=
-currtotaltime:= 150.;
-currprob:=25;
-thisgameboard:=Board.newboard !currx !curry !currprob;
-game_start()
+let easy_mode () =
+  currtotaltime := 150.;
+  currprob := 25;
+  thisgameboard := Board.newboard !currx !curry !currprob;
+  game_start ()
 
-let medium_mode()= 
-currtotaltime:= 150.;
-currprob:=35;
-thisgameboard:=Board.newboard !currx !curry !currprob;
-currtotaltime:=60.;
-game_start()
+let medium_mode () =
+  currtotaltime := 150.;
+  currprob := 35;
+  thisgameboard := Board.newboard !currx !curry !currprob;
+  currtotaltime := 60.;
+  game_start ()
 
-let hard_mode()= 
-currtotaltime:= 150.;
-currprob:=45;
-thisgameboard:=Board.newboard !currx !curry !currprob; (* this is what breaks the cide *)
-currtotaltime:=40.;
-game_start()
+let hard_mode () =
+  currtotaltime := 150.;
+  currprob := 45;
+  thisgameboard := Board.newboard !currx !curry !currprob;
+  (* this is what breaks the cide *)
+  currtotaltime := 40.;
+  game_start ()
 
 let eval_state () =
   if check_collision_point_rec (get_mouse_position ()) easy_button then (
     easystate := true;
-    edit_game:=true;
-    start_mode:=false;
-    easy_mode();
-    )
+    edit_game := true;
+    start_mode := false;
+    easy_mode ())
   else if check_collision_point_rec (get_mouse_position ()) medium_button then (
     mediumstate := true;
-    edit_game:=true;
-    start_mode:=false;
-    medium_mode();)
+    edit_game := true;
+    start_mode := false;
+    medium_mode ())
   else if check_collision_point_rec (get_mouse_position ()) hard_button then (
     hardstate := true;
-    edit_game:=true;
-    start_mode:=false;
+    edit_game := true;
+    start_mode := false;
     game_start ())
 
 let buttonn =
@@ -334,9 +320,7 @@ let draw_lose textures =
     ((Array.length !thisgameboard * boxWidth / 2) + 110)
     ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
     50 Color.black;
-  draw_texture (List.nth (textures) 2) 500 200  Color.raywhite
-
-  
+  draw_texture (List.nth textures 2) 500 200 Color.raywhite
 
 let close = ref false
 
@@ -393,21 +377,19 @@ let restart_game () =
   started := true;
   alive := true;
   currstarttime := Raylib.get_time ();
-  if(!easystate=true) then (
-    currtotaltime:=100.;
-     currprob:=20; 
-    thisgameboard:=Board.newboard !currx !curry !currprob;
-  )
-  else if !mediumstate=true then (
-    currtotaltime:=45.;
-     currprob:=40; 
-    thisgameboard:=Board.newboard !currx !curry !currprob; 
-  )
+  if !easystate = true then (
+    currtotaltime := 100.;
+    currprob := 20;
+    thisgameboard := Board.newboard !currx !curry !currprob)
+  else if !mediumstate = true then (
+    currtotaltime := 45.;
+    currprob := 40;
+    thisgameboard := Board.newboard !currx !curry !currprob)
   else (
-    currtotaltime:=31.;
-    currprob:=40; 
-    thisgameboard:=Board.newboard !currx !curry !currprob; );
-  drawGrid (Board.boardwithvalue (!thisgameboard))
+    currtotaltime := 31.;
+    currprob := 40;
+    thisgameboard := Board.newboard !currx !curry !currprob);
+  drawGrid (Board.boardwithvalue !thisgameboard)
 
 let quit_game () =
   end_drawing ();
@@ -416,122 +398,141 @@ let quit_game () =
 
 let draw_win textures =
   clear_background Color.raywhite;
-  draw_rectangle
-  (top_bar_size) (top_bar_size) 200 100 Color.pink;
-  draw_rectangle
-  (top_bar_size+210) (top_bar_size) 200 100 Color.pink;
-  draw_text "YIPEEEEEEE, YOU WON" (top_bar_size-100) 
-  (top_bar_size-200) 50 Color.pink;
-  draw_text "another challenge?"
-  (top_bar_size-190) (top_bar_size-150) 25 Color.pink;
-  draw_text "ye"
-  (top_bar_size+10)(top_bar_size)
-  50 Color.black;
-  draw_texture (List.nth (textures) 0) 500 200  Color.raywhite;
-  draw_text "nah"
-  (top_bar_size+220)(top_bar_size)
-  50 Color.black
-
-
+  draw_rectangle top_bar_size top_bar_size 200 100 Color.pink;
+  draw_rectangle (top_bar_size + 210) top_bar_size 200 100 Color.pink;
+  draw_text "YIPEEEEEEE, YOU WON" (top_bar_size - 100) (top_bar_size - 200) 50
+    Color.pink;
+  draw_text "another challenge?" (top_bar_size - 190) (top_bar_size - 150) 25
+    Color.pink;
+  draw_text "ye" (top_bar_size + 10) top_bar_size 50 Color.black;
+  draw_texture (List.nth textures 0) 500 200 Color.raywhite;
+  draw_text "nah" (top_bar_size + 220) top_bar_size 50 Color.black
 
 let buttonywin =
-    Rectangle.create
-    ((top_bar_size)|>float_of_int) ((top_bar_size)|> float_of_int)200. 100.
-  
+  Rectangle.create
+    (top_bar_size |> float_of_int)
+    (top_bar_size |> float_of_int)
+    200. 100.
+
 let buttonnwin =
-      Rectangle.create
-      ((top_bar_size+210)|>float_of_int) ((top_bar_size)|> float_of_int)200. 100.
-  
+  Rectangle.create
+    (top_bar_size + 210 |> float_of_int)
+    (top_bar_size |> float_of_int)
+    200. 100.
+
 let ifwin = ref false
 
 let draw_instructions () =
   clear_background Color.green;
   draw_text "Press a start button to start playing" 350 650 30 Color.black;
-  draw_text "Instructions: The numbers in the gray boxes correspond" 50 ((screenwidth / 10)+120) 30 Color.black;
-  draw_text "to the amount of mines directly touching that box (adjacent)" 50 ((screenwidth / 10)+155) 30 Color.black;
-  draw_text "If the timer runs out, or you click a bomb, you lose!" 50 ((screenwidth / 10)+190) 30 Color.black
+  draw_text "Instructions: The numbers in the gray boxes correspond" 50
+    ((screenwidth / 10) + 120)
+    30 Color.black;
+  draw_text "to the amount of mines directly touching that box (adjacent)" 50
+    ((screenwidth / 10) + 155)
+    30 Color.black;
+  draw_text "If the timer runs out, or you click a bomb, you lose!" 50
+    ((screenwidth / 10) + 190)
+    30 Color.black
 
 let draw_beginning_screen () =
   draw_instructions ();
   draw_easy_button ();
   draw_medium_button ();
   draw_hard_button ()
-let lose textures = 
+
+let lose textures =
   drawGrid (Board.boardwithvalue !thisgameboard);
   clear_background Color.raywhite;
   draw_lose textures
- 
-let halftime()=
-  let intoftime =(!currtotaltime)|>int_of_float 
-    in
-  intoftime/2
+
+let halftime () =
+  let intoftime = !currtotaltime |> int_of_float in
+  intoftime / 2
 
 let draw_time orig_seconds remaining_seconds =
-  let ycoord = top_bar_size-50 in
-  let offset=30 in
-  let xcoord=top_bar_size+offset in 
-  if (!currtotaltime=30. && !alive=true) then
-    match remaining_seconds with 
-    | _ -> draw_text "Practice ends in " (xcoord) (ycoord-50) 40 Color.red;
-    draw_text (string_of_int remaining_seconds) (xcoord+100) ycoord 50 Color.red
-  else if(!easystate=true && !alive=true) then(
-    draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
-  match remaining_seconds with
-  | 75 ->  draw_text "25% there. you got this." (xcoord+offset) ycoord 30 Color.red
-  | 50 ->  draw_text "HALF TIMEEEEEE" (xcoord+offset) ycoord 50 Color.red
-  | 20 -> draw_text "20 SECS LEFT" (xcoord+offset) ycoord 50 Color.red
-  | 10 -> draw_text "10 SECS LEFT!!!!" (xcoord+offset) ycoord 50 Color.red
-  | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
-  | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
-  | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
-  | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
-  | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
-  | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
-  else if(!mediumstate=true && !alive=true) then(
-    draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+  let ycoord = top_bar_size - 50 in
+  let offset = 30 in
+  let xcoord = top_bar_size + offset in
+  if !currtotaltime = 30. && !alive = true then (
+    match remaining_seconds with
+    | _ ->
+        draw_text "Practice ends in " xcoord (ycoord - 50) 40 Color.red;
+        draw_text
+          (string_of_int remaining_seconds)
+          (xcoord + 100) ycoord 50 Color.red)
+  else if !easystate = true && !alive = true then (
+    draw_text "Time remaining: " (xcoord - offset) (ycoord - 75) 50 Color.red;
+    match remaining_seconds with
+    | 75 ->
+        draw_text "25% there. you got this." (xcoord + offset) ycoord 30
+          Color.red
+    | 50 -> draw_text "HALF TIMEEEEEE" (xcoord + offset) ycoord 50 Color.red
+    | 20 -> draw_text "20 SECS LEFT" (xcoord + offset) ycoord 50 Color.red
+    | 10 -> draw_text "10 SECS LEFT!!!!" (xcoord + offset) ycoord 50 Color.red
+    | 5 -> draw_text "FIVE SECONDS!!" (xcoord + offset) ycoord 50 Color.red
+    | 4 -> draw_text "HURRY UP BRUH" (xcoord + offset) ycoord 50 Color.red
+    | 3 -> draw_text "THREE SECS LEFT" (xcoord + offset) ycoord 50 Color.red
+    | 2 -> draw_text "TWOOOOOOO" (xcoord + offset) ycoord 50 Color.red
+    | 1 -> draw_text "ONEEEEEEE" (xcoord + offset) ycoord 50 Color.red
+    | 0 -> draw_text "YOU LOSEEEEEE" (xcoord + 70) ycoord 50 Color.red
+    | _ ->
+        draw_text
+          (string_of_int remaining_seconds)
+          (xcoord + 70) ycoord 50 Color.red)
+  else if !mediumstate = true && !alive = true then (
+    draw_text "Time remaining: " (xcoord - offset) (ycoord - 75) 50 Color.red;
 
-  match remaining_seconds with
-  | 22 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
-  | 10 -> draw_text "75% there. you got this." (xcoord+offset) ycoord 30 Color.red
-  | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
-  | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
-  | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
-  | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
-  | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
-  | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
-else if(!hardstate=true && !alive=true) then
-  (draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+    match remaining_seconds with
+    | 22 -> draw_text "HALF TIMEEE" (xcoord + offset) ycoord 50 Color.red
+    | 10 ->
+        draw_text "75% there. you got this." (xcoord + offset) ycoord 30
+          Color.red
+    | 5 -> draw_text "FIVE SECONDS!!" (xcoord + offset) ycoord 50 Color.red
+    | 4 -> draw_text "HURRY UP BRUH" (xcoord + offset) ycoord 50 Color.red
+    | 3 -> draw_text "THREE SECS LEFT" (xcoord + offset) ycoord 50 Color.red
+    | 2 -> draw_text "TWOOOOOOO" (xcoord + offset) ycoord 50 Color.red
+    | 1 -> draw_text "ONEEEEEEE" (xcoord + offset) ycoord 50 Color.red
+    | 0 -> draw_text "YOU LOSEEEEEE" (xcoord + 70) ycoord 50 Color.red
+    | _ ->
+        draw_text
+          (string_of_int remaining_seconds)
+          (xcoord + 70) ycoord 50 Color.red)
+  else if !hardstate = true && !alive = true then (
+    draw_text "Time remaining: " (xcoord - offset) (ycoord - 75) 50 Color.red;
 
-  match remaining_seconds with
-  | 15 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
-  | 10 -> draw_text "10 seconds. you got this." (xcoord+offset) ycoord 30 Color.red
-  | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
-  | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
-  | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
-  | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
-  | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
-  | 0 -> draw_text "YOU LOSE. it's ok that was hard." (xcoord+70) ycoord 20 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
+    match remaining_seconds with
+    | 15 -> draw_text "HALF TIMEEE" (xcoord + offset) ycoord 50 Color.red
+    | 10 ->
+        draw_text "10 seconds. you got this." (xcoord + offset) ycoord 30
+          Color.red
+    | 5 -> draw_text "FIVE SECONDS!!" (xcoord + offset) ycoord 50 Color.red
+    | 4 -> draw_text "HURRY UP BRUH" (xcoord + offset) ycoord 50 Color.red
+    | 3 -> draw_text "THREE SECS LEFT" (xcoord + offset) ycoord 50 Color.red
+    | 2 -> draw_text "TWOOOOOOO" (xcoord + offset) ycoord 50 Color.red
+    | 1 -> draw_text "ONEEEEEEE" (xcoord + offset) ycoord 50 Color.red
+    | 0 ->
+        draw_text "YOU LOSE. it's ok that was hard." (xcoord + 70) ycoord 20
+          Color.red
+    | _ ->
+        draw_text
+          (string_of_int remaining_seconds)
+          (xcoord + 70) ycoord 50 Color.red)
 
-let rec loop () info_packet=
+let rec loop () info_packet =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
-    let elapsed_time = Raylib.get_time () -. !currstarttime 
-  in
-    let time_left = int_of_float !currtotaltime - int_of_float elapsed_time 
-  in
+    let elapsed_time = Raylib.get_time () -. !currstarttime in
+    let time_left = int_of_float !currtotaltime - int_of_float elapsed_time in
     begin_drawing ();
-    if(!start_mode=true)then (
-      if is_mouse_button_pressed MouseButton.Left then eval_state(); 
-    );
-    if !started = true && !ifwin = false && time_left >=0 then (
+    if !start_mode = true then
+      if is_mouse_button_pressed MouseButton.Left then eval_state ();
+    if !started = true && !ifwin = false && time_left >= 0 then (
       draw_stats ();
       draw_time
-       ((elapsed_time |> int_of_float) + 
-       (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0))
-       (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
+        ((elapsed_time |> int_of_float)
+        + max (int_of_float !currtotaltime - int_of_float elapsed_time) 0)
+        (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
       if not !alive then (
         lose info_packet.textures;
         if is_mouse_button_pressed MouseButton.Left then
@@ -548,30 +549,28 @@ let rec loop () info_packet=
         if is_mouse_button_pressed MouseButton.Left then
           let mouse_pos = get_mouse_position in
           findCollision (mouse_pos ())))
-    else if !ifwin = false && !started=false then (
-          draw_beginning_screen ();
-          clear_background Color.white)
-    else if time_left<0 then(
+    else if !ifwin = false && !started = false then (
+      draw_beginning_screen ();
+      clear_background Color.white)
+    else if time_left < 0 then (
       lose info_packet.textures;
       if is_mouse_button_pressed MouseButton.Left then
         if check_collision_point_rec (get_mouse_position ()) buttony then
           restart_game ()
         else if check_collision_point_rec (get_mouse_position ()) buttonn then
           quit_game ())
-    else if time_left>=0 then (
+    else if time_left >= 0 then (
       draw_win info_packet.textures;
-      if is_mouse_button_pressed MouseButton.Left then(
-        if check_collision_point_rec (get_mouse_position ()) buttonywin then(
-          ifwin:=false;
+      if is_mouse_button_pressed MouseButton.Left then
+        if check_collision_point_rec (get_mouse_position ()) buttonywin then (
+          ifwin := false;
           restart_game ())
-        else if check_collision_point_rec (get_mouse_position ()) buttonnwin then(
-          ifwin:=false;
-          quit_game ())
-      ));
-
+        else if check_collision_point_rec (get_mouse_position ()) buttonnwin
+        then (
+          ifwin := false;
+          quit_game ()));
 
     end_drawing ();
-    loop ()
-      {textures = info_packet.textures;}
+    loop () { textures = info_packet.textures }
 
-let () = setup () |> loop()
+let () = setup () |> loop ()
