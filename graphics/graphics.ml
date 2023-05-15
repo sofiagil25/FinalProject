@@ -424,10 +424,11 @@ let draw_win textures =
   (top_bar_size-200) 50 Color.pink;
   draw_text "another challenge?"
   (top_bar_size-190) (top_bar_size-150) 25 Color.pink;
+  draw_texture (List.nth (textures) 0) 300 200  Color.raywhite;
   draw_text "ye"
   (top_bar_size+10)(top_bar_size)
   50 Color.black;
-  draw_texture (List.nth (textures) 0) 500 200  Color.raywhite;
+  draw_texture (List.nth (textures) 4) 500 200  Color.raywhite;
   draw_text "nah"
   (top_bar_size+220)(top_bar_size)
   50 Color.black
