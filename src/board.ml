@@ -81,7 +81,10 @@ let rec placeobs (bor : box array array) =
      flag = f;
      obstacle = _;
      solution = _;
-    } -> bx.obstacle := true
+    } ->
+        bx.obstacle := true;
+        let _ = print_string (string_of_bool !(bx.obstacle)) in
+        bx.obstacle := true
     | _ -> placeobs bor)
 
 let rec placesol (bor : box array array) =
@@ -175,10 +178,10 @@ let samesize (b1 : box array array) (b2 : box array array) =
   && Array.length (Array.get b1 0) = Array.length (Array.get b2 0)
 
 let boxequal (b1 : box) (b2 : box) =
-  (* !(b1.flag) = !(b2.flag) && b1.col = b2.col && b1.row = b2.row && b1.bomb =
-     b2.bomb && *)
-  b1.count = b2.count
-(* && !(b1.obstacle) = !(b2.obstacle) && !(b1.solution) = !(b2.solution) *)
+  !(b1.flag) = !(b2.flag) && b1.col = b2.col && b1.row = b2.row
+  && b1.bomb = b2.bomb && b1.count = b2.count
+  && !(b1.obstacle) = !(b2.obstacle)
+  && !(b1.solution) = !(b2.solution)
 
 (* returns true if to rows of boxes are equal *)
 (* let rowequal (r1 : box array) (r2 : box array) (equalfun : box -> box ->
@@ -197,7 +200,8 @@ let rowequal (r1 : box array) (r2 : box array) (equalfun : box -> box -> bool) =
         else false
       else true
     in
-    let _ = print_string (string_of_bool (iter 0 (Array.length r1) true)) in
+    (* let _ = print_string (string_of_bool (iter 0 (Array.length r1) true))
+       in *)
     iter 0 (Array.length r1) true
 
 let simpleequal (b1 : box) (b2 : box) =
@@ -237,4 +241,16 @@ let isboardsequalquestionmark (b1 : box array array) (b2 : box array array) =
     iter 0 (Array.length b1) true
   else false
 
-(* let *)
+let printline line row =
+  Array.iteri
+    (fun ind box ->
+      print_int row;
+      print_string ", ";
+
+      print_int ind;
+      print_int row;
+      print_string "= ";
+      print_string (string_of_bool !(box.obstacle)))
+    line
+
+let printboard board = Array.iteri (fun row line -> printline line row) board
