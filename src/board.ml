@@ -210,6 +210,7 @@ let isboardsequalquestionmarksimple (b1 : box array array)
 (* isboardequalsquestionmark board1 board2 checks that b1 and b2 are the same
    box array array. Assumes all the rows in each array are the same length *)
 let isboardsequalquestionmark (b1 : box array array) (b2 : box array array) =
+<<<<<<< HEAD
   if samesize b1 b2 then (
     let row = ref 0 in
     let vali = ref true in
@@ -221,3 +222,16 @@ let isboardsequalquestionmark (b1 : box array array) (b2 : box array array) =
   else false
 
 (* let *)
+=======
+  assert (samesize b1 b2);
+  let row = ref 0 in
+  let vali = ref true in
+  while !row < Array.length b1 && !vali do
+    vali := rowequal (Array.get b1 !row) (Array.get b1 !row);
+    row := !row + 1
+  done;
+  !vali
+
+
+
+>>>>>>> c1b916110db773bf787fd3f746f16664d9624ff5

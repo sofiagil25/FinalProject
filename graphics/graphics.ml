@@ -73,22 +73,27 @@ let rec drawGrid m =
   done
 
 let alive = ref true
+let isZero x y =
+  Board.getcount (Board.boardwithvalue !thisgameboard) x y = 0
+
+  
+
+let isBomb x y =
+    Board.ismine (Board.boardwithvalue !thisgameboard) x y = -1
+    
+
+
+let tileStatus x y =
+ match rects.(x).(y) with
+    | _, b -> b
+
+
+let showTile x y =
+ match rects.(x).(y) with
+    | rectangle, _ -> rects.(x).(y) <- (rectangle, true)
+
 
 let rec expandZeroTiles i j : unit =
-  let isZero x y =
-    Board.getcount (Board.boardwithvalue !thisgameboard) x y = 0
-  in
-  let isBomb x y =
-    Board.ismine (Board.boardwithvalue !thisgameboard) x y = -1
-  in
-  let tileStatus x y =
-    match rects.(x).(y) with
-    | _, b -> b
-  in
-  let showTile x y =
-    match rects.(x).(y) with
-    | rectangle, _ -> rects.(x).(y) <- (rectangle, true)
-  in
   if (not (isBomb i j)) && not (isZero i j) then begin
     (*if not a zero tile but also not a bomb tile, then reveal those around it*)
     showTile i j;
@@ -269,7 +274,7 @@ let draw_lose () =
   draw_text "you are a loser :c"
     ((Array.length !thisgameboard * boxWidth / 3) - 50)
     (Array.length (Array.get !thisgameboard 0) * boxWidth / 3)
-    50 Color.white;
+    50 Color.orange;
   draw_rectangle
     ((Array.length !thisgameboard * boxWidth / 3) - 70)
     (Array.length (Array.get !thisgameboard 0) * boxWidth / 2)
@@ -281,7 +286,7 @@ let draw_lose () =
   draw_text "try again?"
     ((Array.length !thisgameboard * boxWidth / 3) + 60)
     ((Array.length (Array.get !thisgameboard 0) * boxWidth / 3) + 70)
-    40 Color.white;
+    40 Color.orange;
   draw_text "ye"
     (Array.length !thisgameboard * boxWidth / 3)
     ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) + 25)
@@ -348,22 +353,16 @@ let restart_game () =
   currstarttime := Raylib.get_time ();
   if(!easystate=true) then (
     currtotaltime:=100.;
-    (* currx:=5; *)
-    (* curry:=5; *)
      currprob:=20; 
     thisgameboard:=Board.newboard !currx !curry !currprob;
   )
   else if !mediumstate=true then (
     currtotaltime:=45.;
-    (* currx:=10; *)
-    (* curry:=10; *)
      currprob:=40; 
     thisgameboard:=Board.newboard !currx !curry !currprob; 
   )
   else (
-    currtotaltime:=30.;
-    (* currx:=20; *)
-    (* curry:=20; *)
+    currtotaltime:=31.;
     currprob:=40; 
     thisgameboard:=Board.newboard !currx !curry !currprob; );
   drawGrid (Board.boardwithvalue (!thisgameboard))
@@ -390,27 +389,27 @@ let draw_beginning_screen () =
   draw_medium_button ();
   draw_hard_button ()
 let lose () = 
-clear_background Color.raywhite;
-drawGrid (Board.boardwithvalue !thisgameboard);
-draw_lose ();
-if is_mouse_button_pressed MouseButton.Left then
-if check_collision_point_rec (get_mouse_position ()) buttony then
-  restart_game ()
-else if check_collision_point_rec (get_mouse_position ()) buttonn then
-quit_game ()
+  drawGrid (Board.boardwithvalue !thisgameboard);
+  clear_background Color.raywhite;
+  draw_lose ()
+ 
 let halftime()=
-let intoftime =(!currtotaltime)|>int_of_float 
-in
-intoftime/2
+  let intoftime =(!currtotaltime)|>int_of_float 
+    in
+  intoftime/2
 
 let draw_time orig_seconds remaining_seconds =
   let ycoord = top_bar_size-50 in
-  let offset=70 in
+  let offset=30 in
   let xcoord=top_bar_size+offset in 
-  draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
-  if(!easystate=true) then
+  if (!currtotaltime=30. && !alive=true) then
+    match remaining_seconds with 
+    | _ -> draw_text "Practice ends in " (xcoord) (ycoord-50) 40 Color.red;
+    draw_text (string_of_int remaining_seconds) (xcoord+100) ycoord 50 Color.red
+  else if(!easystate=true && !alive=true) then(
+    draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
   match remaining_seconds with
-  | 75 ->  draw_text "25% there. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 75 ->  draw_text "25% there. you got this." (xcoord+offset) ycoord 30 Color.red
   | 50 ->  draw_text "HALF TIMEEEEEE" (xcoord+offset) ycoord 50 Color.red
   | 20 -> draw_text "20 SECS LEFT" (xcoord+offset) ycoord 50 Color.red
   | 10 -> draw_text "10 SECS LEFT!!!!" (xcoord+offset) ycoord 50 Color.red
@@ -420,33 +419,37 @@ let draw_time orig_seconds remaining_seconds =
   | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
   | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
-  else if(!mediumstate=true) then
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
+  else if(!mediumstate=true && !alive=true) then(
+    draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+
   match remaining_seconds with
   | 22 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
-  | 10 -> draw_text "75% there. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 10 -> draw_text "75% there. you got this." (xcoord+offset) ycoord 30 Color.red
   | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
   | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
   | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
   | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
   | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
-else if(!hardstate=true) then
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
+else if(!hardstate=true && !alive=true) then
+  (draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+
   match remaining_seconds with
   | 15 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
-  | 10 -> draw_text "10 seconds. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 10 -> draw_text "10 seconds. you got this." (xcoord+offset) ycoord 30 Color.red
   | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
   | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
   | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
   | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
-  | 0 -> draw_text "YOU LOSE. it's ok that was hard." (xcoord+70) ycoord 50 Color.red
-  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
+  | 0 -> draw_text "YOU LOSE. it's ok that was hard." (xcoord+70) ycoord 20 Color.red
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red)
+
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
-    let open Raylib in
     let elapsed_time = Raylib.get_time () -. !currstarttime 
   in
     let time_left = int_of_float !currtotaltime - int_of_float elapsed_time 
@@ -462,9 +465,7 @@ let rec loop () =
        (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0))
        (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
       if not !alive then (
-        clear_background Color.raywhite;
-        drawGrid (Board.boardwithvalue !thisgameboard);
-        draw_lose ();
+        lose();
         if is_mouse_button_pressed MouseButton.Left then
           if check_collision_point_rec (get_mouse_position ()) buttony then
             restart_game ()
@@ -482,11 +483,16 @@ let rec loop () =
     else if !ifwin = false && !started=false then (
           draw_beginning_screen ();
           clear_background Color.white)
-    else if time_left<0 then
-      lose()
- 
+    else if time_left<0 then(
+      lose();
+      if is_mouse_button_pressed MouseButton.Left then
+        if check_collision_point_rec (get_mouse_position ()) buttony then
+          restart_game ()
+        else if check_collision_point_rec (get_mouse_position ()) buttonn then
+          quit_game ())
     else if time_left>=0 then 
       draw_win ();
+
     end_drawing ();
     loop ()
 
