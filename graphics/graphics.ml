@@ -18,16 +18,22 @@ let setup () =
   let micheal_clarkson_mad = load_image "img/clarkson.jpeg" in
   let dexter_kozen = load_image "img/dexter.jpeg" in
   let derek = load_image "img/derek.jpeg" in
+  let sofia = load_image "img/sofia.png"in
+  let lauren = load_image "img/lauren.png"in
+
 
   image_resize (addr micheal_clarkson) 200 200;
   (*used*)
   image_resize (addr coin) 200 200;
   image_resize (addr heart) 200 200;
-  image_resize (addr bomb) 100 100;
+  image_resize (addr bomb) boxWidth boxWidth;
   image_resize (addr micheal_clarkson_mad) 200 200;
   (*used*)
   image_resize (addr dexter_kozen) 200 200;
   image_resize (addr derek) 200 200;
+  image_resize (addr sofia) 200 200;
+  image_resize (addr lauren) 200 200;
+
 
   let clarkson_texture = load_texture_from_image micheal_clarkson in
   let coin_texture = load_texture_from_image coin in
@@ -36,6 +42,10 @@ let setup () =
   let clarkson_mad_texture = load_texture_from_image micheal_clarkson_mad in
   let dexter_texture = load_texture_from_image dexter_kozen in
   let derek_texture = load_texture_from_image derek in
+  let sofia_texture = load_texture_from_image sofia in
+  let lauren_texture = load_texture_from_image lauren in
+
+
 
   unload_image micheal_clarkson;
   unload_image coin;
@@ -44,6 +54,8 @@ let setup () =
   unload_image micheal_clarkson_mad;
   unload_image dexter_kozen;
   unload_image derek;
+  unload_image sofia;
+  unload_image lauren;
   {
     textures =
       [
@@ -54,6 +66,8 @@ let setup () =
         clarkson_mad_texture;
         dexter_texture;
         derek_texture;
+        sofia_texture;
+        lauren_texture;
       ];
   }
 
@@ -575,9 +589,10 @@ let draw_beginning_screen () =
   draw_info_button ();
   draw_team_button ()
 
-let draw_team () =
+let draw_team textures =
   clear_background Color.beige;
   draw_exit_button ();
+  draw_texture (List.nth textures 7) 600 150 Color.raywhite;
   draw_text "Sofia is a computer science major from New York State." 300 150 25
     Color.black;
   draw_text "She LOVES mindsweeper, reading, and listening to sad" 300 175 25
@@ -587,6 +602,7 @@ let draw_team () =
   draw_text "is pictured here holding a small bird." 300 225 25 Color.black;
   draw_text "" 300 250 25 Color.black;
   draw_text "" 300 275 25 Color.black;
+  draw_texture (List.nth textures 8) 600 300 Color.raywhite;
   draw_text "Hi! My name is Lauren Lee and i’m a sophomore in biomedical" 300
     300 25 Color.black;
   draw_text "engineering. I just really love OCaml probably more than " 300 325
@@ -595,6 +611,8 @@ let draw_team () =
     Color.black;
   draw_text "" 300 375 25 Color.black;
   draw_text "" 300 400 25 Color.black;
+  draw_texture (List.nth textures 6) 600 425 Color.raywhite;
+
   draw_text "Hey I'm Derek, a freshman doing computer science. I love" 300 425
     25 Color.black;
   draw_text "eating cheesecake and doing OCaml in my free time! I'm a" 300 450
@@ -810,7 +828,7 @@ let rec loop () info_packet =
       if is_mouse_button_pressed MouseButton.Left then eval_exit ())
     else if !ifwin = false && !started = false && !team = true then (
       Raylib.clear_background Color.black;
-      draw_team ();
+      draw_team textures;
       if is_mouse_button_pressed MouseButton.Left then eval_exit ())
     else if time_left < 0 then (
       lose textures;
