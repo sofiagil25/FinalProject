@@ -11,12 +11,16 @@ let setup () =
 
 let currx = ref 5
 let curry = ref 5
+let edit_game = ref (false)
+
+let start_mode=ref(true)
 let currprob = ref 25
 let currtotaltime = ref 0.
 let currstarttime = ref 0.
 let thisgameboard = ref (Board.newboard !currx !curry !currprob)
 let started = ref false
 let top_bar_size = (screenwidth / 2) - (boxWidth / 2 * !currx)
+
 
 let rec buildRects m =
   let rects =
@@ -149,7 +153,8 @@ let buttony =
 let draw_easy_button () =
   draw_rectangle
     ((screenwidth / 2) - 300)
-    (screenwidth / 10) 200 100 Color.black;
+    (screenwidth / 10) 200 
+    100 Color.black;
   draw_text "Easy"
     ((screenwidth / 2) - 240)
     ((screenwidth / 10) + 20)
@@ -210,15 +215,48 @@ let game_start () =
   currstarttime := Raylib.get_time ();
   currtotaltime := 30.
 
+let easy_mode()=
+currtotaltime:= 150.;
+currx:=5;
+curry:=5;
+currprob:=25;
+thisgameboard:=Board.newboard !currx !curry !currprob;
+game_start()
+
+let medium_mode()= 
+currtotaltime:= 150.;
+currx:=5;
+curry:=5;
+currprob:=35;
+thisgameboard:=Board.newboard !currx !curry !currprob;
+currtotaltime:=60.;
+game_start()
+
+let hard_mode()= 
+currtotaltime:= 150.;
+currx:=20;
+curry:=20;
+currprob:=45;
+thisgameboard:=Board.newboard !currx !curry !currprob; (* this is what breaks the cide *)
+currtotaltime:=40.;
+game_start()
+
 let eval_state () =
   if check_collision_point_rec (get_mouse_position ()) easy_button then (
     easystate := true;
-    game_start ())
+    edit_game:=true;
+    start_mode:=false;
+    easy_mode();
+    )
   else if check_collision_point_rec (get_mouse_position ()) medium_button then (
     mediumstate := true;
-    game_start ())
+    edit_game:=true;
+    start_mode:=false;
+    medium_mode();)
   else if check_collision_point_rec (get_mouse_position ()) hard_button then (
     hardstate := true;
+    edit_game:=true;
+    start_mode:=false;
     game_start ())
 
 let buttonn =
@@ -302,14 +340,33 @@ let draw_stats () =
 
 let restart_game () =
   clear_background Color.white;
-  thisgameboard := Board.newboard !currx !curry 15;
+  (* thisgameboard := Board.newboard !currx !curry !currprob; *)
   flagstate := false;
   resetBoard 0 0;
   started := true;
   alive := true;
   currstarttime := Raylib.get_time ();
-  currtotaltime := 30.;
-  drawGrid (Board.boardwithvalue !thisgameboard)
+  if(!easystate=true) then (
+    currtotaltime:=30.;
+    (* currx:=5; *)
+    (* curry:=5; *)
+    (* currprob:=20; *)
+    thisgameboard:=Board.newboard !currx !curry !currprob;
+  )
+  else if !mediumstate=true then (
+    currtotaltime:=40.;
+    (* currx:=10; *)
+    (* curry:=10; *)
+    (* currprob:=30; *)
+    thisgameboard:=Board.newboard !currx !curry !currprob; 
+  )
+  else (
+    currtotaltime:=100.;
+    (* currx:=20; *)
+    (* curry:=20; *)
+    (* currprob:=40; *)
+    thisgameboard:=Board.newboard !currx !curry !currprob; );
+  drawGrid (Board.boardwithvalue (!thisgameboard))
 
 let quit_game () =
   end_drawing ();
@@ -342,22 +399,25 @@ let draw_time orig_seconds remaining_seconds =
   | 2 -> draw_text "TWOOOOOOO" 650 450 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" 650 450 50 Color.red
   | _ -> draw_text (string_of_int remaining_seconds) 650 450 50 Color.red
-
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
     let open Raylib in
-    let elapsed_time = Raylib.get_time () -. !currstarttime in
-    let remaining_seconds =
-      max (int_of_float !currtotaltime - int_of_float elapsed_time) 0
-    in
+    let elapsed_time = Raylib.get_time () -. !currstarttime 
+  in
     begin_drawing ();
-    if is_mouse_button_pressed MouseButton.Left then eval_state ();
+    if(!start_mode=true)then (
+      if is_mouse_button_pressed MouseButton.Left then eval_state(); 
+      (* print_string("checking eval state"); *)
+    );
+    (* if(!edit_game=true) then (thisgameboard:=Board.newboard !currx !curry !currprob; edit_game:=false;       *)
+    (* print_string("rewriting gameboard")); *)
+
     if !started = true && !ifwin = false then (
       draw_stats ();
       draw_time
-        ((elapsed_time |> int_of_float) + remaining_seconds)
-        remaining_seconds;
+        ((elapsed_time |> int_of_float) + (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0))
+       (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
       if not !alive then (
         clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
