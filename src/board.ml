@@ -114,6 +114,14 @@ let getobs (box : box) = !(box.obstacle)
 (* getsol box is a returns whether a box is an solution *)
 let getsol (box : box) = !(box.solution)
 
+let issolution (board : board) (x : int) (y : int) =
+  getsol (Array.get (Array.get board.base y) x)
+
+let isobstabcle (board : board) (x : int) (y : int) t =
+  getobs (Array.get (Array.get board.base y) x)
+
+let getobsofboard (b : board) = b.base
+
 (* makes a new empty line of boxes, not bombs at row height *)
 let newemptyline height (length : int) prob : box array =
   Array.init length (fun i ->
@@ -198,8 +206,7 @@ let rowequal (r1 : box array) (r2 : box array) (equalfun : box -> box -> bool) =
        in *)
     iter 0 (Array.length r1) true
 
-let simpleequal (b1 : box) (b2 : box) =
-  !(b1.flag) == !(b2.flag) && b1.bomb == b2.bomb
+let simpleequal (b1 : box) (b2 : box) = b1.bomb == b2.bomb
 
 (* isboardequalsquestionmark board1 board2 checks that b1 and b2 are the same
    box array array. Assumes all the rows in each array are the same length *)
@@ -234,6 +241,29 @@ let isboardsequalquestionmark (b1 : box array array) (b2 : box array array) =
     in
     iter 0 (Array.length b1) true
   else false
+
+let string_of_box box = string_of_int box.count
+
+let rec line_to_string line row =
+  let str = ref "[" in
+  for i = 0 to Array.length line - 1 do
+    if i > 0 then str := !str ^ "; ";
+    str := !str ^ "[";
+    str := !str ^ "(" ^ row ^ ", " ^ string_of_int i ^ ") =";
+    str := !str ^ string_of_box (Array.get line i);
+    str := !str ^ "]"
+  done;
+  !str ^ "]"
+
+let to_string board acc =
+  let str = ref "[" in
+  for i = 0 to Array.length board - 1 do
+    if i > 0 then str := !str ^ "; ";
+    str := !str ^ "[";
+    str := !str ^ string_of_box (Array.get board i);
+    str := !str ^ "]"
+  done;
+  !str ^ "]"
 
 let printline line row =
   match Array.length line with
