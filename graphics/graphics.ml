@@ -357,7 +357,7 @@ let restart_game () =
     currtotaltime:=45.;
     (* currx:=10; *)
     (* curry:=10; *)
-     currprob:=30; 
+     currprob:=40; 
     thisgameboard:=Board.newboard !currx !curry !currprob; 
   )
   else (
@@ -398,21 +398,50 @@ if check_collision_point_rec (get_mouse_position ()) buttony then
   restart_game ()
 else if check_collision_point_rec (get_mouse_position ()) buttonn then
 quit_game ()
-
+let halftime()=
+let intoftime =(!currtotaltime)|>int_of_float 
+in
+intoftime/2
 
 let draw_time orig_seconds remaining_seconds =
   let ycoord = top_bar_size-50 in
-  let offset=320 in
+  let offset=70 in
   let xcoord=top_bar_size+offset in 
-  draw_text "Time remaining: " (xcoord-offset) ycoord (50) Color.red;
+  draw_text "Time remaining: " (xcoord-offset) (ycoord-75) (50) Color.red;
+  if(!easystate=true) then
   match remaining_seconds with
-  | 10 -> draw_text "HALF TIME LEFT" (xcoord+offset) ycoord 50 Color.red
-  | 5 -> draw_text "FIVE SECONDS" (xcoord+offset) ycoord 50 Color.red
-  | 4 -> draw_text "HURRY UP" (xcoord+offset) ycoord 50 Color.red
+  | 75 ->  draw_text "25% there. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 50 ->  draw_text "HALF TIMEEEEEE" (xcoord+offset) ycoord 50 Color.red
+  | 20 -> draw_text "20 SECS LEFT" (xcoord+offset) ycoord 50 Color.red
+  | 10 -> draw_text "10 SECS LEFT!!!!" (xcoord+offset) ycoord 50 Color.red
+  | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
+  | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
   | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
   | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
   | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
-  | 0 -> draw_text "YOU LOSSEEEEEE" (xcoord+70) ycoord 50 Color.red
+  | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
+  else if(!mediumstate=true) then
+  match remaining_seconds with
+  | 22 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
+  | 10 -> draw_text "75% there. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
+  | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
+  | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
+  | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
+  | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
+  | 0 -> draw_text "YOU LOSEEEEEE" (xcoord+70) ycoord 50 Color.red
+  | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
+else if(!hardstate=true) then
+  match remaining_seconds with
+  | 15 -> draw_text "HALF TIMEEE" (xcoord+offset) ycoord 50 Color.red
+  | 10 -> draw_text "10 seconds. you got this." (xcoord+offset) ycoord 50 Color.red
+  | 5 -> draw_text "FIVE SECONDS!!" (xcoord+offset) ycoord 50 Color.red
+  | 4 -> draw_text "HURRY UP BRUH" (xcoord+offset) ycoord 50 Color.red
+  | 3 -> draw_text "THREE SECS LEFT" (xcoord+offset) ycoord 50 Color.red
+  | 2 -> draw_text "TWOOOOOOO" (xcoord+offset) ycoord 50 Color.red
+  | 1 -> draw_text "ONEEEEEEE" (xcoord+offset) ycoord 50 Color.red
+  | 0 -> draw_text "YOU LOSE. it's ok that was hard." (xcoord+70) ycoord 50 Color.red
   | _ -> draw_text (string_of_int remaining_seconds) (xcoord+70) ycoord 50 Color.red
 let rec loop () =
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
