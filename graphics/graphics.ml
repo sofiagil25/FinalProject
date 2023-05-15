@@ -290,6 +290,7 @@ let rec loop () =
         clear_background Color.raywhite;
         drawGrid (Board.boardwithvalue !thisgameboard);
         draw_lose ();
+
         if is_mouse_button_pressed MouseButton.Left then
           if check_collision_point_rec (get_mouse_position ()) buttony then
             restart_game ()
