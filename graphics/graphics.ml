@@ -379,17 +379,20 @@ let info = ref false
 let team = ref false
 let menu = ref true
 
+(*intializes game state*)
 let game_start () =
   started := true;
   currstarttime := Raylib.get_time ();
   currtotaltime := 30.
 
+  (*settings for easy difficulty*)
 let easy_mode () =
   currtotaltime := 150.;
   currprob := 10;
   thisgameboard := Board.newboard !currx !curry !currprob;
   game_start ()
 
+  (*settings for medium mode*)
 let medium_mode () =
   currtotaltime := 150.;
   currprob := 25;
@@ -397,6 +400,7 @@ let medium_mode () =
   currtotaltime := 60.;
   game_start ()
 
+  (*settings for hard mode*)
 let hard_mode () =
   currtotaltime := 150.;
   currprob := 35;
@@ -405,6 +409,7 @@ let hard_mode () =
   currtotaltime := 40.;
   game_start ()
 
+  (*evaluates which mode you picked (easy, medium, hard)*)
 let eval_state () =
   if check_collision_point_rec (get_mouse_position ()) easy_button then (
     easystate := true;
@@ -439,10 +444,11 @@ let eval_state () =
     team := true;
     info := false)
 
+    (*checks if you exited the menu or not*)
 let eval_exit () =
   if check_collision_point_rec (get_mouse_position ()) exit_button then
     menu := true
-
+(*the i dont wan't to play again button*)
 let buttonn =
   Rectangle.create
     (float_of_int ((Array.length !thisgameboard * boxWidth / 2) + 50))
@@ -515,9 +521,10 @@ let countuncovered () : int =
   done;
   !x
 
+(*draws stats for testing purposes*)
 let draw_stats () =
-  draw_text (string_of_int (countbombs ())) 350 450 50 Color.black;
-  draw_text (string_of_int (countuncovered ())) 450 450 50 Color.black;
+  draw_text (string_of_int (countbombs ())) 350 450 50 Color.white;
+  draw_text (string_of_int (countuncovered ())) 450 450 50 Color.white;
   draw_text
     (string_of_int
        (Array.length !thisgameboard * Array.length (Array.get !thisgameboard 0)))
@@ -550,6 +557,7 @@ let quit_game () =
   started := true;
   close := true
 
+  (*draws the winning screen*)
 let draw_win textures =
   clear_background Color.raywhite;
   draw_rectangle top_bar_size top_bar_size 200 100 Color.pink;
@@ -577,6 +585,7 @@ let buttonnwin =
 
 let ifwin = ref false
 
+  (*draws instructions on home screen*)
 let draw_instructions () =
   clear_background Color.green;
   draw_text "Press a start button to start playing" ((screenwidth / 2) - 300) 
@@ -597,6 +606,7 @@ let draw_instructions () =
   ((screenwidth/10) + 225)
   30 Color.black
 
+  (*draws all of the initial homescreen buttons**)
 let draw_beginning_screen () =
   draw_instructions ();
   draw_easy_button ();
@@ -605,6 +615,7 @@ let draw_beginning_screen () =
   draw_info_button ();
   draw_team_button ()
 
+  (*draws the team screen*)
 let draw_team textures =
   clear_background Color.beige;
   draw_exit_button ();
@@ -642,6 +653,7 @@ let draw_team textures =
   draw_text "OCAML, she likes to dance or code more for CUAIR!" 300 600 25
     Color.black
 
+    (*Draws the info screen*)
 let draw_info () : unit =
   clear_background Color.beige;
   draw_exit_button ();
@@ -807,23 +819,30 @@ let draw_time orig_seconds remaining_seconds =
 (* this function basically goes runs every single frame. this needs to be big because 
    otherwise the mouse click will not be registered correctly.*)
 let rec loop () info_packet =
+  (*loading pictures*)
   let textures=info_packet.textures in
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
   else
+    (*stores the time of game start for the timer *)
     let elapsed_time = Raylib.get_time () -. !currstarttime in
     let time_left = int_of_float !currtotaltime - int_of_float elapsed_time in
     begin_drawing ();
+    (*checks modes and checks the according buttons for pressing (this one checks the difficulty)*)
     if !start_mode = true && !menu = true then (
       if is_mouse_button_pressed MouseButton.Left then eval_state ())
+    (*evaluates if you are exiting the menu/team pagfe and puts you back in the start area*)
     else if !start_mode = true && (!info = true || !team = true) then
       if is_mouse_button_pressed MouseButton.Left then eval_exit ();
     if !started = true && !ifwin = false && time_left >= 0 then (
-      draw_stats ();
+      (*draws stats for testing and evaluates whether or not your in flag mode*)
+      draw_stats();
       eval_flagstate (Board.boardwithvalue !thisgameboard);
+      (*draws the timer (needs to happen in realtime)*)
       draw_time
         ((elapsed_time |> int_of_float)
         + max (int_of_float !currtotaltime - int_of_float elapsed_time) 0)
         (max (int_of_float !currtotaltime - int_of_float elapsed_time) 0);
+      (*if you die, draws the lose stuff and then checks if you press you want to play again or not*)
       if not !alive then (
         lose textures;
         if is_mouse_button_pressed MouseButton.Left then
@@ -831,6 +850,8 @@ let rec loop () info_packet =
             restart_game textures
           else if check_collision_point_rec (get_mouse_position ()) buttonn then
             quit_game ())
+      (*if the cursor is not on screen then the game doesn't work properly-- ensures you don't
+         click from a different tab*)
       else if is_cursor_on_screen () then (
         if (!currx * !curry) - countuncovered () = countbombs () then (
           ifwin := true;
@@ -840,17 +861,21 @@ let rec loop () info_packet =
         if is_mouse_button_pressed MouseButton.Left then
           let mouse_pos = get_mouse_position in
           findCollision (mouse_pos ())))
+    (*draws beginning screen if you just started your game*)
     else if !ifwin = false && !started = false && !menu = true then (
       draw_beginning_screen ();
       clear_background Color.white)
+    (*initializes window to black and draws the information you need*)
     else if !ifwin = false && !started = false && !info = true then (
       Raylib.clear_background Color.black;
       draw_info ();
       if is_mouse_button_pressed MouseButton.Left then eval_exit ())
+    (*draws the team page*)
     else if !ifwin = false && !started = false && !team = true then (
       Raylib.clear_background Color.black;
       draw_team textures;
       if is_mouse_button_pressed MouseButton.Left then eval_exit ())
+    (*dies if time left is over*)
     else if time_left < 0 then (
       lose textures;
       if is_mouse_button_pressed MouseButton.Left then
@@ -858,6 +883,7 @@ let rec loop () info_packet =
           restart_game textures
         else if check_collision_point_rec (get_mouse_position ()) buttonn then
           quit_game ())
+    
     else if time_left >= 0 then (
       draw_win textures;
       if is_mouse_button_pressed MouseButton.Left then
