@@ -336,6 +336,7 @@ let draw_exit_button () =
     ((screenwidth / 10) - 50)
     30 Color.white
 
+    (*creates mode buttons to be clicked*)
 let easy_button =
   Rectangle.create
     (intro_left_margin|>float_of_int)
@@ -354,11 +355,13 @@ let hard_button =
     (float_of_int (screenwidth / 10))
     200. 100.
 
+    (*creates info and team buttons*)
 let info_button =
   Rectangle.create
     ((intro_left_margin|>float_of_int)+.100.)
     (float_of_int ((screenwidth / 10) + 500))
     200. 100.
+
 
 let team_button =
   Rectangle.create
@@ -366,12 +369,14 @@ let team_button =
     (((screenwidth / 10) + 550)|>float_of_int)
     200. 100.
 
+    (*button to exit menu and info*)
 let exit_button =
   Rectangle.create
     (float_of_int ((screenwidth / 2) - 500))
     (float_of_int ((screenwidth / 10) - 100))
     200. 100.
 
+    (*more state variables*)
 let easystate = ref false
 let mediumstate = ref false
 let hardstate = ref false
@@ -571,12 +576,14 @@ let draw_win textures =
   draw_texture (List.nth textures 5) 500 200 Color.raywhite;
   draw_text "nah" (top_bar_size + 220) top_bar_size 50 Color.black
 
+  (*creates yes button for respawning*)
 let buttonywin =
   Rectangle.create
     (top_bar_size |> float_of_int)
     (top_bar_size |> float_of_int)
     200. 100.
 
+    (*creates no button for clicking*)
 let buttonnwin =
   Rectangle.create
     (top_bar_size + 210 |> float_of_int)
