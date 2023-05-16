@@ -9,6 +9,7 @@ let left_margin = screenwidth/6
 
 type info_packet = { textures : Texture2D.t list }
 
+(*loads images and sets up the screen based on set width*)
 let setup () =
   init_window screenwidth screenwidth "Minesweeper";
   set_target_fps 60;
@@ -74,6 +75,7 @@ let setup () =
       ];
   }
 
+ (*ref global variables to store status*)
 let currx = ref 6
 let curry = ref 6
 let flagstate = ref false
@@ -89,6 +91,7 @@ let thisgameboard = ref (Board.newboard !currx !curry !currprob)
 let started = ref false
 let top_bar_size = (screenwidth / 2) - (boxWidth / 2 * !currx)-75
 
+(*builds the rectangles of minesweeper as clickable buttons*)
 let rec buildRects m =
   let rects =
     Array.make_matrix (Array.length m)
@@ -108,10 +111,13 @@ let rec buildRects m =
   done;
   rects
 
+(*calculating some values that will be used throuhgout*)
+
 let rects = buildRects !thisgameboard
 let y_coordinate orig_width j = top_bar_size + (j * orig_width)
 let x_coordinate orig_width x = top_bar_size + (x * orig_width)
 
+(*draw the game board with values *)
 let rec drawGrid m textures=
   for i = 0 to Array.length m - 1 do
     for j = 0 to Array.length (Array.get m i) - 1 do
@@ -145,8 +151,6 @@ let rec drawGrid m textures=
           boxWidth boxWidth Color.yellow;
         draw_texture (List.nth textures 3) (x_coordinate boxWidth i)
          (y_coordinate boxWidth j) Color.raywhite))
-
-        
     done
   done
 
@@ -761,8 +765,9 @@ let draw_time orig_seconds remaining_seconds =
     draw_text "Time remaining: " (xcoord - offset) (ycoord - 75) 50 Color.red;
 
     match remaining_seconds with
-    | 22 -> draw_text "HALF TIMEEE" (xcoord + offset) ycoord 50 Color.red
-    | 10 ->
+    | 30 ->draw_text "30 seconds left!!!!!!!" (xcoord + offset) ycoord 50 Color.red
+    |22 -> draw_text "HALF TIMEEE" (xcoord + offset) ycoord 50 Color.red
+    |10 ->
         draw_text "75% there. you got this." (xcoord + offset) ycoord 30
           Color.red
     | 5 -> draw_text "FIVE SECONDS!!" (xcoord + offset) ycoord 50 Color.red
@@ -779,6 +784,9 @@ let draw_time orig_seconds remaining_seconds =
     draw_text "Time remaining: " (xcoord - offset) (ycoord - 75) 50 Color.red;
 
     match remaining_seconds with
+    | 31-> draw_text "SAD Lambda wishes you luck" (xcoord + offset) ycoord 50 Color.red
+    | 30-> draw_text "SAD Lambda wishes you luck" (xcoord + offset) ycoord 50 Color.red
+    | 20-> draw_text "20 SECONDS LEFT" (xcoord + offset) ycoord 50 Color.red
     | 15 -> draw_text "HALF TIMEEE" (xcoord + offset) ycoord 50 Color.red
     | 10 ->
         draw_text "10 seconds. you got this." (xcoord + offset) ycoord 30
@@ -796,6 +804,8 @@ let draw_time orig_seconds remaining_seconds =
           (string_of_int remaining_seconds)
           (xcoord + 70) ycoord 50 Color.red)
 
+(* this function basically goes runs every single frame. this needs to be big because 
+   otherwise the mouse click will not be registered correctly.*)
 let rec loop () info_packet =
   let textures=info_packet.textures in
   if Raylib.window_should_close () || !close = true then Raylib.close_window ()
