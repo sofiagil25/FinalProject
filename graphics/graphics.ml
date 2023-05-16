@@ -2,7 +2,10 @@ open Raylib
 open Game
 
 let boxWidth : int = 80
-let screenwidth = 1500
+let screenwidth = 1200
+
+let intro_left_margin = screenwidth/6
+let left_margin = screenwidth/6
 
 type info_packet = { textures : Texture2D.t list }
 
@@ -16,8 +19,8 @@ let setup () =
   let heart = load_image "img/heart.png" in
   let bomb = load_image "img/bomb.png" in
   let micheal_clarkson_mad = load_image "img/clarkson.jpeg" in
-  let dexter_kozen = load_image "img/dexter.jpeg" in
-  let derek = load_image "img/derek.jpeg" in
+  let dexter_kozen = load_image "img/dexter.png" in
+  let derek = load_image "img/derek.png" in
   let sofia = load_image "img/sofia.png"in
   let lauren = load_image "img/lauren.png"in
 
@@ -80,9 +83,11 @@ let start_mode = ref true
 let currprob = ref 25
 let currtotaltime = ref 0.
 let currstarttime = ref 0.
+let left_margin = screenwidth/6
+
 let thisgameboard = ref (Board.newboard !currx !curry !currprob)
 let started = ref false
-let top_bar_size = (screenwidth / 2) - (boxWidth / 2 * !currx)
+let top_bar_size = (screenwidth / 2) - (boxWidth / 2 * !currx)-75
 
 let rec buildRects m =
   let rects =
@@ -220,19 +225,18 @@ let buttony =
 
 let flag_button =
   Rectangle.create
-    (float_of_int ((Array.length !thisgameboard * boxWidth / 2) + 240))
-    (float_of_int
-       ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) - 50))
+    (750|>float_of_int)
+    (230|>float_of_int)
     100. 50.
 
 let draw_flag_button () =
   draw_rectangle
-    ((Array.length !thisgameboard * boxWidth / 2) + 240)
-    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) - 50)
+    (750)
+    (230)
     100 50 Color.yellow;
   draw_text "FLAG"
-    ((Array.length !thisgameboard * boxWidth / 2) + 250)
-    ((Array.length (Array.get !thisgameboard 0) * boxWidth / 2) - 40)
+    (760)
+    (250)
     30 Color.red
 
 let eval_flagstate m =
@@ -250,38 +254,39 @@ let eval_flagstate m =
 
 let draw_easy_button () =
   draw_rectangle
-    ((screenwidth / 2) - 300)
+    (intro_left_margin)
+    (* ((screenwidth / 4) - 300) *)
     (screenwidth / 10) 200 100 Color.black;
   draw_text "Easy"
-    ((screenwidth / 2) - 240)
+    (intro_left_margin+60)
     ((screenwidth / 10) + 20)
     30 Color.red;
   draw_text "Start"
-    ((screenwidth / 2) - 240)
+    (intro_left_margin+60)
     ((screenwidth / 10) + 50)
     30 Color.red
 
 let draw_medium_button () =
-  draw_rectangle (screenwidth / 2) (screenwidth / 10) 200 100 Color.black;
+  draw_rectangle (left_margin  + 300) (screenwidth / 10) 200 100 Color.black;
   draw_text "Medium"
-    ((screenwidth / 2) + 50)
+    (left_margin  + 360 )
     ((screenwidth / 10) + 20)
     30 Color.red;
   draw_text "Start"
-    ((screenwidth / 2) + 50)
+    (left_margin  + 360)
     ((screenwidth / 10) + 50)
     30 Color.red
 
 let draw_hard_button () =
   draw_rectangle
-    ((screenwidth / 2) + 300)
+    (left_margin  + 600)
     (screenwidth / 10) 200 100 Color.black;
   draw_text "Hard"
-    ((screenwidth / 2) + 360)
+    (left_margin + 660)
     ((screenwidth / 10) + 20)
     30 Color.red;
   draw_text "Start"
-    ((screenwidth / 2) + 360)
+    (left_margin + 660)
     ((screenwidth / 10) + 50)
     30 Color.red
 
@@ -301,17 +306,17 @@ let draw_info_button () =
 
 let draw_team_button () =
   draw_rectangle
-    ((screenwidth / 2) - 350)
-    ((screenwidth / 10) + 700)
+    (intro_left_margin+400)
+    ((screenwidth / 10) + 500)
     200 100 Color.orange;
   draw_text "Meet"
-    ((screenwidth / 2) - 290)
-    ((screenwidth / 10) + 720)
-    30 Color.white;
+    (intro_left_margin+460)
+    ((screenwidth / 10) + 520)
+    30 Color.black;
   draw_text "Team"
-    ((screenwidth / 2) - 290)
-    ((screenwidth / 10) + 750)
-    30 Color.white
+    (intro_left_margin+460)
+    ((screenwidth / 10) + 550)
+    30 Color.black
 
 let draw_exit_button () =
   draw_rectangle
@@ -319,42 +324,42 @@ let draw_exit_button () =
     ((screenwidth / 10) - 100)
     200 100 Color.red;
   draw_text "Exit"
-    ((screenwidth / 2) - 440)
+    ((screenwidth / 2) - 470)
     ((screenwidth / 10) - 80)
     30 Color.white;
   draw_text "To Menu"
-    ((screenwidth / 2) - 440)
+    ((screenwidth / 2) - 470)
     ((screenwidth / 10) - 50)
     30 Color.white
 
 let easy_button =
   Rectangle.create
-    (float_of_int ((screenwidth / 2) - 300))
+    (intro_left_margin|>float_of_int)
     (float_of_int (screenwidth / 10))
     200. 100.
 
 let medium_button =
   Rectangle.create
-    (float_of_int (screenwidth / 2))
-    (float_of_int (screenwidth / 10))
+  ((intro_left_margin|>float_of_int)+.360.)
+  (float_of_int (screenwidth / 10))
     200. 100.
 
 let hard_button =
   Rectangle.create
-    (float_of_int ((screenwidth / 2) + 300))
+  ((intro_left_margin|>float_of_int)+.600.)
     (float_of_int (screenwidth / 10))
     200. 100.
 
 let info_button =
   Rectangle.create
-    (float_of_int ((screenwidth / 2) - 350))
+    ((intro_left_margin|>float_of_int)+.100.)
     (float_of_int ((screenwidth / 10) + 500))
     200. 100.
 
 let team_button =
   Rectangle.create
-    (float_of_int ((screenwidth / 2) - 350))
-    (float_of_int ((screenwidth / 10) + 700))
+    ((intro_left_margin|>float_of_int)+.400.)
+    (((screenwidth / 10) + 550)|>float_of_int)
     200. 100.
 
 let exit_button =
@@ -549,9 +554,9 @@ let draw_win textures =
     Color.pink;
   draw_text "another challenge?" (top_bar_size - 190) (top_bar_size - 150) 25
     Color.pink;
-  draw_texture (List.nth textures 0) 300 200 Color.raywhite;
+  draw_texture (List.nth textures 0) left_margin 200 Color.raywhite;
   draw_text "ye" (top_bar_size + 10) top_bar_size 50 Color.black;
-  draw_texture (List.nth textures 4) 500 200 Color.raywhite;
+  draw_texture (List.nth textures 5) 500 200 Color.raywhite;
   draw_text "nah" (top_bar_size + 220) top_bar_size 50 Color.black
 
 let buttonywin =
@@ -570,16 +575,23 @@ let ifwin = ref false
 
 let draw_instructions () =
   clear_background Color.green;
-  draw_text "Press a start button to start playing" 350 650 30 Color.black;
-  draw_text "Instructions: The numbers in the gray boxes correspond" 50
+  draw_text "Press a start button to start playing" ((screenwidth / 2) - 300) 
+  ((screenwidth / 10) + 270) 30 Color.blue;
+  draw_text "Instructions: The numbers in the gray boxes " (intro_left_margin)
     ((screenwidth / 10) + 120)
     30 Color.black;
-  draw_text "to the amount of mines directly touching that box (adjacent)" 50
+  draw_text "correspond to the amount of mines directly touching " 
+  (intro_left_margin)
     ((screenwidth / 10) + 155)
     30 Color.black;
-  draw_text "If the timer runs out, or you click a bomb, you lose!" 50
+  draw_text "that box (adjacent). If the timer runs out, "
+   (intro_left_margin)
     ((screenwidth / 10) + 190)
-    30 Color.black
+    30 Color.black;
+  draw_text "or you click a bomb, you lose!"
+  (intro_left_margin)
+  ((screenwidth/10) + 225)
+  30 Color.black
 
 let draw_beginning_screen () =
   draw_instructions ();
@@ -592,7 +604,7 @@ let draw_beginning_screen () =
 let draw_team textures =
   clear_background Color.beige;
   draw_exit_button ();
-  draw_texture (List.nth textures 7) 600 150 Color.raywhite;
+  draw_texture (List.nth textures 7) 70 150 Color.raywhite;
   draw_text "Sofia is a computer science major from New York State." 300 150 25
     Color.black;
   draw_text "She LOVES mindsweeper, reading, and listening to sad" 300 175 25
@@ -612,7 +624,6 @@ let draw_team textures =
   draw_text "" 300 375 25 Color.black;
   draw_text "" 300 400 25 Color.black;
   draw_texture (List.nth textures 6) 600 425 Color.raywhite;
-
   draw_text "Hey I'm Derek, a freshman doing computer science. I love" 300 425
     25 Color.black;
   draw_text "eating cheesecake and doing OCaml in my free time! I'm a" 300 450
@@ -633,79 +644,79 @@ let draw_info () : unit =
   draw_text
     "Minesweeper is a classic puzzle video game that has been popularized on \
      various computer platforms."
-    100 100 25 Color.black;
+    100 120 25 Color.black;
   draw_text
     "The objective of the game is to clear a rectangular grid containing \
      hidden mines without detonating any of them."
-    100 125 25 Color.black;
+    100 150 25 Color.black;
   draw_text
     "The player must strategically uncover squares on the grid, with each \
      square either revealing a number indicating the number of adjacent mines \
      or being empty."
-    100 150 25 Color.black;
+    100 175 25 Color.black;
   draw_text
     "By using the revealed numbers as clues, the player must deduce the \
      locations of the mines and mark them with flags."
-    100 175 25 Color.black;
+    100 200 25 Color.black;
   draw_text "" 100 200 25 Color.black;
   draw_text
     "The history of Minesweeper dates back to the 1960s when it originated as \
      a mainframe computer game called \"Cube.\""
-    100 225 25 Color.black;
+    100 275 25 Color.black;
   draw_text
     "However, the version we are most familiar with today was developed for \
      the Microsoft Windows operating system."
-    100 250 25 Color.black;
+    100 300 25 Color.black;
   draw_text
     "Minesweeper was introduced as a part of the Windows Entertainment Pack in \
      1990, bundled with other simple games."
-    100 275 25 Color.black;
+    100 325 25 Color.black;
   draw_text "" 100 300 25 Color.black;
   draw_text
     "The popularity of Minesweeper soared with the release of Windows 3.1 in \
      1992, as it was included as a standard pre-installed game."
-    100 325 25 Color.black;
+    100 375 25 Color.black;
   draw_text
     "It quickly became a beloved pastime for many Windows users, offering a \
      challenging and addictive gameplay experience."
-    100 350 25 Color.black;
+    100 400 25 Color.black;
   draw_text "" 100 375 25 Color.black;
   draw_text
     "The mechanics and rules of Minesweeper are relatively straightforward, \
      making it accessible to players of all ages."
-    100 400 25 Color.black;
+    100 425 25 Color.black;
   draw_text
     "Its popularity grew further due to its inclusion in subsequent Windows \
      versions, ensuring its availability to a wide audience."
-    100 425 25 Color.black;
+    100 450 25 Color.black;
   draw_text
     "The game's simplicity, coupled with its puzzle-solving aspect, has made \
      it a favorite time-killer for many."
-    100 450 25 Color.black;
+    100 475 25 Color.black;
   draw_text "" 100 475 25 Color.black;
   draw_text "Minesweeper's influence also extended beyond the Windows platform."
-    100 500 25 Color.black;
+    100 525 25 Color.black;
   draw_text
     "It was adapted for various other operating systems, including macOS, \
      Linux, and mobile platforms."
-    100 525 25 Color.black;
+    100 550 25 Color.black;
   draw_text
     "Numerous clones and variants of the game were developed for different \
      devices and gaming platforms, contributing to its enduring appeal."
-    100 550 25 Color.black;
+    100 575 25 Color.black;
   draw_text "" 100 575 25 Color.black;
   draw_text
     "While Minesweeper might not boast the graphical sophistication or \
      complexity of modern games,"
-    100 600 25 Color.black;
+    100 625 25 Color.black;
   draw_text
     "its strategic gameplay and addictive nature have allowed it to stand the \
      test of time."
-    100 625 25 Color.black;
+    100 650 25 Color.black;
   draw_text
     "It remains a beloved and iconic game in the history of computer gaming, \
      recognized for its simplicity, logical thinking requirements, and"
-    100 650 25 Color.black
+    100 675 25 Color.black
 
 let lose textures =
   drawGrid (Board.boardwithvalue !thisgameboard) textures;
@@ -717,7 +728,7 @@ let halftime () =
   intoftime / 2
 
 let draw_time orig_seconds remaining_seconds =
-  let ycoord = top_bar_size - 50 in
+  let ycoord = top_bar_size - 100 in
   let offset = 30 in
   let xcoord = top_bar_size + offset in
   if !currtotaltime = 30. && !alive = true then (
