@@ -667,79 +667,79 @@ let draw_info () : unit =
   draw_text
     "Minesweeper is a classic puzzle video game that has been popularized on \
      various computer platforms."
-    100 120 25 Color.black;
+    70 120 20 Color.black;
   draw_text
     "The objective of the game is to clear a rectangular grid containing \
      hidden mines without detonating any of them."
-    100 150 25 Color.black;
+    70 150 20 Color.black;
   draw_text
     "The player must strategically uncover squares on the grid, with each \
      square either revealing a number indicating the number of adjacent mines \
      or being empty."
-    100 175 25 Color.black;
+    70 175 20 Color.black;
   draw_text
     "By using the revealed numbers as clues, the player must deduce the \
      locations of the mines and mark them with flags."
-    100 200 25 Color.black;
-  draw_text "" 100 200 25 Color.black;
+    70 200 20 Color.black;
+  draw_text "" 100 200 20 Color.black;
   draw_text
     "The history of Minesweeper dates back to the 1960s when it originated as \
      a mainframe computer game called \"Cube.\""
-    100 275 25 Color.black;
+    70 275 20 Color.black;
   draw_text
     "However, the version we are most familiar with today was developed for \
      the Microsoft Windows operating system."
-    100 300 25 Color.black;
+    70 300 20 Color.black;
   draw_text
     "Minesweeper was introduced as a part of the Windows Entertainment Pack in \
      1990, bundled with other simple games."
-    100 325 25 Color.black;
-  draw_text "" 100 300 25 Color.black;
+    70 325 20 Color.black;
+  draw_text "" 100 300 20 Color.black;
   draw_text
     "The popularity of Minesweeper soared with the release of Windows 3.1 in \
      1992, as it was included as a standard pre-installed game."
-    100 375 25 Color.black;
+  70 375 20 Color.black;
   draw_text
     "It quickly became a beloved pastime for many Windows users, offering a \
      challenging and addictive gameplay experience."
-    100 400 25 Color.black;
-  draw_text "" 100 375 25 Color.black;
+    70 400 20 Color.black;
+  draw_text "" 100 375 20 Color.black;
   draw_text
     "The mechanics and rules of Minesweeper are relatively straightforward, \
      making it accessible to players of all ages."
-    100 425 25 Color.black;
+    70 425 20 Color.black;
   draw_text
     "Its popularity grew further due to its inclusion in subsequent Windows \
      versions, ensuring its availability to a wide audience."
-    100 450 25 Color.black;
+    70 450 20 Color.black;
   draw_text
     "The game's simplicity, coupled with its puzzle-solving aspect, has made \
      it a favorite time-killer for many."
-    100 475 25 Color.black;
-  draw_text "" 100 475 25 Color.black;
+    70 475 20 Color.black;
+  draw_text "" 100 475 20 Color.black;
   draw_text "Minesweeper's influence also extended beyond the Windows platform."
-    100 525 25 Color.black;
+    70 525 20 Color.black;
   draw_text
     "It was adapted for various other operating systems, including macOS, \
      Linux, and mobile platforms."
-    100 550 25 Color.black;
+    70 550 20 Color.black;
   draw_text
     "Numerous clones and variants of the game were developed for different \
      devices and gaming platforms, contributing to its enduring appeal."
-    100 575 25 Color.black;
-  draw_text "" 100 575 25 Color.black;
+    70 575 20 Color.black;
+  draw_text "" 70 575 20 Color.black;
   draw_text
     "While Minesweeper might not boast the graphical sophistication or \
      complexity of modern games,"
-    100 625 25 Color.black;
+    70 625 20 Color.black;
   draw_text
     "its strategic gameplay and addictive nature have allowed it to stand the \
      test of time."
-    100 650 25 Color.black;
+    70 650 20 Color.black;
   draw_text
     "It remains a beloved and iconic game in the history of computer gaming, \
      recognized for its simplicity, logical thinking requirements, and"
-    100 675 25 Color.black
+    70 675 20 Color.black
 
 let lose textures =
   drawGrid (Board.boardwithvalue !thisgameboard) textures;
